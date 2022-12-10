@@ -1,6 +1,18 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+// import {createApp, VueElement} from 'vue'
+// import App from './App.vue'
+//
+// import './assets/main.css'
+//
+// createApp(App).mount('#app')
+// import {createApp} from "vue";
 
-import './assets/main.css'
+const { createApp } = Vue
+const PhotoApp = {
+    data(){
+        return {
+            message: "Hello World"
+        }
+    }
+}
+createApp(PhotoApp).mount('#app')
 
-createApp(App).mount('#app')
