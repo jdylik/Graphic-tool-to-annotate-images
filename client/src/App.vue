@@ -5,17 +5,12 @@ import TheWelcome from './components/TheWelcome.vue'-->
 
 <template>
 <div id="app">
-    <p>{{ greeting }}</p>
-    <p>{{ flaskGreeting }}</p>
+    <button v-on:click="">Import folder</button>
 </div>
 </template>
 
 <script>
 export default {
-    name: 'App',
-    components: {
-        HelloWorld
-    },
     data: function(){
         return {
             greeting: 'Hello, Vue!',

@@ -7,6 +7,8 @@ CORS(app)
 @app.route("/greeting")
 def greeting():  # put application's code here
     return {"greeting": "Let's start!"}
+def button_click():
+    return {"clk": "Std"}
 
 
 if __name__ == '__main__':
