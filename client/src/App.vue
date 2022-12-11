@@ -1,11 +1,8 @@
-<!--<script setup>-->
-<!--import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'-->
-<!--</script>-->
-
 <template>
 <div id="app">
-    <button v-on:click="">Import folder</button>
+    <input type="file" id="input_folder" style="display:none;" onblur="this.get_files()" webkitdirectory directory multiple />
+    <label for="input_folder" style="cursor: pointer; border: 1px solid red;">Import folders</label>
+  <p>{{this.files}}</p>
 </div>
 </template>
 
@@ -13,14 +10,18 @@ import TheWelcome from './components/TheWelcome.vue'-->
 export default {
     data: function(){
         return {
-            greeting: 'Hello, Vue!',
-            flaskGreeting: ''
+            files: 0
         }
     },
-    created: async function(){
-        const gResponse = await fetch("http://localhost:5000/greeting");
-        const gObject = await gResponse.json();
-        this.flaskGreeting = gObject.greeting;
-    }
+  methods:
+      {
+        get_files: function()
+        {
+          let files = document.getElementById("input_folder").files;
+          this.files = files.length;
+          alert("std")
+        }
+
+      }
 }
 </script>
