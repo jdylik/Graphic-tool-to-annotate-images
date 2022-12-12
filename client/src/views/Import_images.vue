@@ -27,3 +27,12 @@ export default {
       }
 }
 </script>
+<style>
+p{
+  padding: 15px;
+  font-size: large;
+}
+input{
+  font-size: medium;
+}
+</style>
