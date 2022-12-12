@@ -1,27 +1,30 @@
 <template>
-<div id="app">
-    <input type="file" id="input_folder" style="display:none;" onblur="this.get_files()" webkitdirectory directory multiple />
-    <label for="input_folder" style="cursor: pointer; border: 1px solid red;">Import folders</label>
-  <p>{{this.files}}</p>
-</div>
+  <nav>
+    <router-link to="/">Importuj</router-link> |
+    <router-link to="/edit">Edytuj</router-link>
+  </nav>
+  <router-view/>
 </template>
 
-<script>
-export default {
-    data: function(){
-        return {
-            files: 0
-        }
-    },
-  methods:
-      {
-        get_files: function()
-        {
-          let files = document.getElementById("input_folder").files;
-          this.files = files.length;
-          alert("std")
-        }
-
-      }
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
 }
-</script>
+
+nav {
+  padding: 30px;
+}
+
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+nav a.router-link-exact-active {
+  color: #42b983;
+}
+</style>
