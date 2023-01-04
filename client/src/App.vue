@@ -5,7 +5,10 @@
     </div>
     <nav>
       <button>
-        <router-link to="/">Importuj</router-link>
+        <router-link to="/login">Zaloguj się</router-link>
+      </button>
+      <button>
+        <router-link to="/import">Importuj</router-link>
       </button>
       <button>
         <router-link to="/edit">Edytuj</router-link>

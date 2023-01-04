@@ -1,40 +1,30 @@
-from flask import Flask, render_template, flash, redirect, url_for
-from forms import RegistrationForm, LoginForm
+from flask import Flask, request
 from flask_cors import CORS
+from flask_mysqldb import MySQL
 import json
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '9332b72257e534031beb9c8ab9674c23'
 CORS(app)
 
-@app.route('/')
-@app.route('/home')
-def home():
-    return render_template('home.html')
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = '1234'
+app.config['MYSQL_DB'] = 'projekt_io'
+mysql = MySQL(app)
 
-@app.route('/name')
-def name():  # put application's code here
-    return json.dumps({"name": "Tutaj będzie można dodać adnotacje do zdjęć."}, ensure_ascii=False)
-
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('home'))
-    return render_template('register.html', title='Register', form=form)
-
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
-            return redirect(url_for('home'))
-        else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
+@app.route('/get_logins_and_passwords')
+def get_logins_and_passwords():
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT login, hasło from logowanie")
+        logdata_list = cur.fetchall()
+        print(logdata_list)
+        cur.close()
+        return json.dumps({"logdatalist": logdata_list}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return("Ojojoj")
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
