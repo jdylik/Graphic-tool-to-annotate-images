@@ -3,46 +3,38 @@
     <p>{{"Kliknij, jeżeli chcesz dodać folder zdjęć"}}</p>
     <input type="file" id="input_folder" @change="onFolder" webkitdirectory directory multiple/>
     <p>{{"Kliknij, jeżeli chcesz dodać zdjęcie"}}</p>
-    <input type="file" id="input_folder" @change="onFile"/>
-    <img :src="imgSrc" v-if="imgSrc"/>
+    <input type="file" id="input_file" @change="onFile"/>
 </div>
 </template>
 
 <script>
 import Edit_images from "@/views/Edit_images.vue";
+import axios from "axios";
 export default {
   name: "Import_images",
-  files:'',
-  components:
-      {
-        Edit_images
-      },
     data: function(){
         return {
           imgSrc:'',
           imgsSrc:[],
-          ims:0,
         }
     },
   mounted:async function()
   {
-    this.ims = 500;
   },
   methods:
       {
         onFile(e)
         {
-          //Edit_images.imn = 20;
-          console.log(Edit_images.imn);
-          console.log(this.ims);
-          this.ims = 6;
-          console.log(this.ims);
-          this.files = e.target.files[0];
-          console.log(this.files);
           const reader = new FileReader();
-          reader.readAsDataURL(this.files);
-          this.imgSrc = reader.result;
-          reader.onload = () => (this.imgSrc = reader.result);
+          reader.readAsDataURL(e.target.files[0]);
+          reader.onload = () =>
+          {
+            this.imgSrc = reader.result;
+            this.imgSrc = this.imgSrc.split(",")[1];
+            let blob_img = this.convert_to_blob(this.imgSrc);
+            //axios.post("http://localhost:5000/insert_new_image", {'blob_img':blob_img});
+            //this.blob_img_d = window.URL.createObjectURL(blob_img);loading from
+          };
         },
         onFolder(e)
         {
@@ -54,14 +46,31 @@ export default {
             this.imgsSrc[i] = reader.result;
           }
         },
-        get_files: function()
+        convert_to_blob: function(imgSrc)
         {
-          let files = document.getElementById("input_folder").files;
-          this.files = files.length;
-          alert("std")
+          const byteCharacters = atob(imgSrc);
+          const byteArrays = [];
+
+          for (let offset = 0; offset < byteCharacters.length; offset += 512)
+          {
+            const slice = byteCharacters.slice(offset, offset + 512);
+
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++)
+            {
+              byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+          }
+
+          const blob = new Blob(byteArrays, {type:'image/jpeg'});
+          return blob;
         }
 
-      }
+      },
+
 }
 </script>
 <style>

@@ -13,6 +13,9 @@
       <button>
         <router-link to="/edit">Edytuj</router-link>
       </button>
+      <button>
+        <router-link to="/logout">Wyloguj się</router-link>
+      </button>
 
     </nav>
     <router-view/>
