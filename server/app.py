@@ -8,7 +8,7 @@ CORS(app)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_PASSWORD'] = '1234'
 app.config['MYSQL_DB'] = 'projekt_io'
 mysql = MySQL(app)
 
@@ -58,32 +58,43 @@ def insert_new_image():
     except Exception:
         cur.close()
         return ("Ojojoj")
-@app.route('/insert_new_images', methods=['POST'])
-def insert_new_images():
+@app.route('/get_imported_images', methods=['POST'])
+def get_imported_images():
     data = request.json
     data = data['params']
-    print(data)
-    images = data[0].split("[")[1].split("]")[0]
-    login = data[1].split(":")[2]
-    password = data.split("password:")[1]
-    print(login, password)
+    login = data.split("\"")[3]
+    password = data.split("\"")[7]
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND hasło = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("INSERT INTO import (obraz, id_uż) VALUES (%s, %s)", (image, id))
-        mysql.connection.commit()
+        cur.execute("SELECT obraz FROM import WHERE id_uż = %s", (id,))
+        images = cur.fetchall()
         cur.close()
-        return ("Success")
+        return json.dumps({"images": images}, ensure_ascii=False)
     except Exception:
         cur.close()
         return ("Ojojoj")
 
-@app.route('/get_imported_images', methods=['POST'])
-def get_imported_images():
-    data = request.args.get("password")
-    print(data)
-    return("Std")
+@app.route('/get_annotated_images', methods=['POST'])
+def get_annotated_images():
+    data = request.json
+    data = data['params']
+    login = data.split("\"")[3]
+    password = data.split("\"")[7]
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND hasło = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT obraz FROM zadnotowane WHERE id_u = %s", (id,))
+        images = cur.fetchall()
+        cur.close()
+        return json.dumps({"images": images}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return ("Ojojoj")
+
 if __name__ == '__main__':
     app.run()

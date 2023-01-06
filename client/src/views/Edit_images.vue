@@ -1,8 +1,9 @@
 
 <template>
   <div id="edit">
-    <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; displayImportedImages();" id="edit"/>
-    <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; displayAnnotatedImages();" id="edit"/>
+    <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit"/>
+    <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit"/>
+    <img :src="imported[0]" v-if="imported[0]" />
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
       <p>Wybierz zdjęcie do edycji</p>
 <!--
@@ -35,19 +36,39 @@ export default {
       imn_a:"",
       visibleLeft:false,
       visibleRight:false,
+      imported:[],
+      annotated:[],
     }
   },
   methods:
       {
-        async displayImportedImages()//zaczęte
+        async loadImportedImages()
         {
-          //const dict = {"login": app.config.globalProperties.$login.value, "password":app.config.globalProperties.$password.value};
-          //axios.get("http://localhost:5000/get_imported_images")
-          //axios.post("http://localhost:5000/insert_new_image", {params:JSON.stringify(dict)});
+          const dict = {"login": app.config.globalProperties.$login.value, "password":app.config.globalProperties.$password.value};
+          const imported = [];
+          await axios.post("http://localhost:5000/get_imported_images", {params:JSON.stringify(dict)}).then(function (response)
+          {
+            for (let i = 0; i < response.data["images"].length; i++)
+            {
+              imported.push("data:image/jpeg;base64,"+response.data["images"][i]);
+            }
+            return imported;
+          });
+          this.imported = imported;
         },
-        async displayAnnotatedImages()
+        async loadAnnotatedImages()
         {
-
+          const dict = {"login": app.config.globalProperties.$login.value, "password":app.config.globalProperties.$password.value};
+          const annotated = [];
+          await axios.post("http://localhost:5000/get_annotated_images", {params:JSON.stringify(dict)}).then(function (response)
+          {
+            for (let i = 0; i < response.data["images"].length; i++)
+            {
+              annotated.push("data:image/jpeg;base64,"+response.data["images"][i]);
+            }
+            return annotated;
+          });
+          this.annotated = annotated;
         },
       }
 }
