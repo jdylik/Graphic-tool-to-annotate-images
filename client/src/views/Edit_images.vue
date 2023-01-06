@@ -1,11 +1,15 @@
 
 <template>
   <div id="edit">
-    <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true;displayImportedImages();" />
-    <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true;displayAnnotatedImages();" />
+    <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; displayImportedImages();" id="edit"/>
+    <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; displayAnnotatedImages();" id="edit"/>
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
-      <a href="#">About</a>
+      <p>Wybierz zdjęcie do edycji</p>
+<!--
+          Tu miniaturki zdjęć:
       <img :src="img_i" v-if="img_i"/>
+-->
+
     </Sidebar>
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
       <a href="#">About</a>
@@ -49,10 +53,58 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+
+#edit{
+  height: 100px;
+}
+
 #sidebar_left
 {
+  width: 20%;
+  height: 100%;
   color:#111;
-  border: 2px solid powderblue;
+  background-color: #2c3e50;
+  text-align: center;
 }
+.p-sidebar-header{
+      margin-left: auto;
+    margin-right: auto;
+}
+.p-sidebar-close{
+  width: 100px;
+  height: 20px;
+  background-color: black;
+  border: solid 2px white;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 4px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#sidebar_right
+{
+  width: 20%;
+  height: 100%;
+  color:#111;
+  background-color: #2c3e50;
+  text-align: center;
+}
+
+.p-sidebar-close:before{
+  content: "X";
+}
+
+
+p{
+  color: white;
+}
+a{
+  color: white;
+}
+
+
+
 </style>
