@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import {app} from '../main.js';
 import Edit_images from "@/views/Edit_images.vue";
 import axios from "axios";
 export default {
@@ -15,7 +16,6 @@ export default {
     data: function(){
         return {
           imgSrc:'',
-          imgsSrc:[],
         }
     },
   mounted:async function()
@@ -30,45 +30,26 @@ export default {
           reader.onload = () =>
           {
             this.imgSrc = reader.result;
-            this.imgSrc = this.imgSrc.split(",")[1];
-            let blob_img = this.convert_to_blob(this.imgSrc);
-            //axios.post("http://localhost:5000/insert_new_image", {'blob_img':blob_img});
-            //this.blob_img_d = window.URL.createObjectURL(blob_img);loading from
+            const image = this.imgSrc.split(",")[1];
+            const dict = {"img": image, "login": app.config.globalProperties.$login.value, "password":app.config.globalProperties.$password.value};
+            axios.post("http://localhost:5000/insert_new_image", {params:JSON.stringify(dict)});
           };
         },
-        onFolder(e)
+        async onFolder(e)
         {
-          const files = e.target.files;
-          const reader = new FileReader();
-          for (let i = 0; i < files.length;i++)
+          for (let i = 0; i < e.target.files.length;i++)
           {
-            reader.readAsDataURL(files[i]);
-            this.imgsSrc[i] = reader.result;
+             const reader = new FileReader();
+              reader.readAsDataURL(e.target.files[i]);
+              reader.onload = () =>
+              {
+                this.imgSrc = reader.result;
+                const image = this.imgSrc.split(",")[1];
+                const dict = {"img": image, "login": app.config.globalProperties.$login.value, "password":app.config.globalProperties.$password.value};
+                axios.post("http://localhost:5000/insert_new_image", {params:JSON.stringify(dict)});
+          };
           }
         },
-        convert_to_blob: function(imgSrc)
-        {
-          const byteCharacters = atob(imgSrc);
-          const byteArrays = [];
-
-          for (let offset = 0; offset < byteCharacters.length; offset += 512)
-          {
-            const slice = byteCharacters.slice(offset, offset + 512);
-
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++)
-            {
-              byteNumbers[i] = slice.charCodeAt(i);
-            }
-
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-          }
-
-          const blob = new Blob(byteArrays, {type:'image/jpeg'});
-          return blob;
-        }
-
       },
 
 }

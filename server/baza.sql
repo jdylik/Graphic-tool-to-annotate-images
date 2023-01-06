@@ -32,7 +32,7 @@ USE `PROJEKT_IO`;
 
 CREATE TABLE `import` (
   `id_o` int(11) NOT NULL,
-  `obraz` mediumblob NOT NULL,
+  `obraz` longtext NOT NULL,
   `id_uż` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -56,7 +56,7 @@ CREATE TABLE `logowanie` (
 
 CREATE TABLE `zadnotowane` (
   `id_e` int(11) NOT NULL,
-  `obraz` mediumblob NOT NULL,
+  `obraz` longtext NOT NULL,
   `id_u` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

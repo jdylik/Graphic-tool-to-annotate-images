@@ -47,6 +47,8 @@ export default {
           for(let i = 0; i < gObject["logdatalist"].length; i++) {
             if (this.user_login === gObject["logdatalist"][i][0] && this.user_password === gObject["logdatalist"][i][1]) {
               app.config.globalProperties.$is_allowed_to_log_in.value = true;
+              app.config.globalProperties.$login.value = this.user_login;
+              app.config.globalProperties.$password.value = this.user_password;
               router.push({path: '/import'});
               break;
             }
@@ -62,25 +64,30 @@ export default {
         },
         async try_to_sign_up(e)
         {
-          if (this.new_user_login.includes("\"") || this.new_user_password.includes("\"") || this.new_user_login === '' || this.new_user_password === '')
+          if (this.new_user_login.includes("\"") || this.new_user_password.includes("\"") || this.new_user_login === '' || this.new_user_password === '' || this.new_user_login.length > 15 || this.new_user_password.length > 15)
           {
-            alert("Pamiętaj, twój login i hasło nie mogą zawierać cudzysłowiu ani być puste. Popraw dane i spróbuj ponownie!")
+            alert("Pamiętaj, twój login i hasło nie mogą zawierać cudzysłowiu ani być puste, a także mieć więcej niż 15 znaków. Popraw dane i spróbuj ponownie!")
             return
           }
           const gResponse = await fetch("http://localhost:5000/get_logins_and_passwords");
           const gObject = await gResponse.json();
-          for(let i = 0; i < gObject["logdatalist"].length; i++)
+          if (gObject["logdatalist"].length === 0)
           {
-            if (this.new_user_login === gObject["logdatalist"][i][0])
-            {
-              alert("Użytkownik o podanym loginie już istnieje. Wybierz inny!");
-              break;
-            }
-            if (this.new_user_login !== gObject["logdatalist"][i][0] && i === gObject["logdatalist"].length - 1)
-            {
-              this.new_data.push(this.new_user_login, this.new_user_password);
-              axios.post("http://localhost:5000/insert_new_data", {params:JSON.stringify(this.new_data)});
-              alert("Teraz możesz zalogować się na podane przez siebie dane.");
+            this.new_data.push(this.new_user_login, this.new_user_password);
+            axios.post("http://localhost:5000/insert_new_data", {params: JSON.stringify(this.new_data)});
+            alert("Teraz możesz zalogować się na podane przez siebie dane.");
+          }
+          else {
+            for (let i = 0; i < gObject["logdatalist"].length; i++) {
+              if (this.new_user_login === gObject["logdatalist"][i][0]) {
+                alert("Użytkownik o podanym loginie już istnieje. Wybierz inny!");
+                break;
+              }
+              if (this.new_user_login !== gObject["logdatalist"][i][0] && i === gObject["logdatalist"].length - 1) {
+                this.new_data.push(this.new_user_login, this.new_user_password);
+                axios.post("http://localhost:5000/insert_new_data", {params: JSON.stringify(this.new_data)});
+                alert("Teraz możesz zalogować się na podane przez siebie dane.");
+              }
             }
           }
           this.new_user_login = '';

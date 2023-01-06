@@ -9,6 +9,8 @@ import InputText from 'primevue/inputtext';
 
 const app = createApp(App);
 app.config.globalProperties.$is_allowed_to_log_in = ref(false);
+app.config.globalProperties.$login = ref('');
+app.config.globalProperties.$password = ref('');
 app.use(router);
 app.use(PrimeVue);
 app.component('Sidebar', Sidebar);
