@@ -1,27 +1,29 @@
 <template>
 <div id="Login">
+  <button id="L" onclick="getElementById('logowanie').style.display='block';getElementById('rejestracja').style.display='none'" >Logowanie</button>
+  <button id="R" onclick="getElementById('rejestracja').style.display='block';getElementById('logowanie').style.display='none'">Rejestracja</button>
+  <div id="logowanie">
+    <label for="login_input">Login:</label>
+    <InputText id="login_input" v-model="user_login"/><br><br>
+    <label for="password_input">Hasło:</label>
+    <input type="password" id="password_input" v-model="user_password"/><br><br>
+    <Button label="Zaloguj się" @click="try_to_log_in()" id="submit"/>
+  </div>
+
   <br/>
-  <br/>
-  <label for="login_input">Login</label>
-  <InputText id="login_input" v-model="user_login"/>
-  <label for="password_input">Hasło</label>
-  <InputText id="password_input" v-model="user_password"/>
-  <Button label="Zaloguj się" @click="try_to_log_in()" />
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <label for="new_login_input">Login</label>
-  <InputText id="new_login_input" v-model="new_user_login"/>
-  <label for="new_password_input">Hasło</label>
-  <InputText id="new_password_input" v-model="new_user_password"/>
-  <Button label="Zarejestruj się" @click="try_to_sign_up()" />
+  <div id="rejestracja">
+    <label for="new_login_input">Login:</label>
+    <InputText id="new_login_input" v-model="new_user_login"/><br><br>
+    <label for="new_password_input" >Hasło:</label>
+    <input type="password" id="new_password_input" v-model="new_user_password"/><br><br>
+    <Button label="Zarejestruj się" @click="try_to_sign_up()" id="submit"/>
+  </div>
+
 </div>
 </template>
 
 <script>
+
 import {app} from '../main.js';
 import router from '../router/index.js';
 import axios from 'axios';
@@ -97,6 +99,51 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+#rejestracja,#logowanie{
+  margin-left: auto;
+  margin-right: auto;
+  padding:20px;
+}
 
+#logowanie{
+  display:none;
+}
+#rejestracja{
+  display:none;
+}
+#L{
+  color: white;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 4px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#R{
+  color: white;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 4px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+#Login{
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+}
+
+#submit{
+  color: white;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 4px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+label{
+  margin-right: 10px;
+}
 </style>

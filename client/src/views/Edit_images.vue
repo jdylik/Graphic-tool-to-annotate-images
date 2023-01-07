@@ -11,6 +11,7 @@
       <img :src="img_i" v-if="img_i"/>
 -->
 
+      <button id="moreL">Załaduj więcej</button>
     </Sidebar>
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
       <a href="#">About</a>
@@ -18,6 +19,7 @@
       <a href="#">Clients</a>
       <a href="#">Contact</a>
       <img :src="img_a" v-if="img_a"/>
+      <button id="moreR">Załaduj więcej</button>
     </Sidebar>
   </div>
 </template>
@@ -89,8 +91,8 @@ export default {
   text-align: center;
 }
 .p-sidebar-header{
-      margin-left: auto;
-    margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 .p-sidebar-close{
   width: 100px;
@@ -126,6 +128,31 @@ a{
   color: white;
 }
 
+#moreL{
+  position: fixed;
+  bottom: 5px;
+  left: 6.5%;
+  color: white;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 4px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#moreR{
+  position: fixed;
+  bottom: 5px;
+  right: 6.5%;
+  color: white;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 4px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
 
+a{
+  padding: 15px;
+}
 
 </style>
