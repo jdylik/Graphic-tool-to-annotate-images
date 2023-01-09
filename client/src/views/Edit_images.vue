@@ -2,7 +2,7 @@
 <template>
   <div id="edit">
     <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit"/>
-    <canvas id="myCanvas" width="666" height="500" style="border:5px solid red;"/>
+    <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
     <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit"/>
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
       <p>Wybierz zdjęcie do edycji</p>
@@ -17,6 +17,7 @@
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
       <Button label="Załaduj więcej" @click="visibleRight = true; loadAnnotatedImages();" id="moreR"/>
     </Sidebar>
+     <Button label="Rysuj" @click="drawRectangle()" id="draw"/>
 
   </div>
 </template>
@@ -33,7 +34,7 @@ export default {
       visibleRight:false,
       imported:[],
       annotated:[],
-      current_img: '',
+      current_img: null,
       displayed_imported_images:[],
       displayed_annotated_images:[],
       canvas:null,
@@ -42,15 +43,15 @@ export default {
   },
   methods:
       {
-        async loadImportedImages()
-        {
-          const dict = {"login": app.config.globalProperties.$login.value, "password":app.config.globalProperties.$password.value};
+        async loadImportedImages() {
+          const dict = {
+            "login": app.config.globalProperties.$login.value,
+            "password": app.config.globalProperties.$password.value
+          };
           const imported = [];
-          await axios.post("http://localhost:5000/get_imported_images", {params:JSON.stringify(dict)}).then(function (response)
-          {
-            for (let i = 0; i < response.data["images"].length; i++)
-            {
-              imported.push("data:image/jpeg;base64,"+response.data["images"][i]);
+          await axios.post("http://localhost:5000/get_imported_images", {params: JSON.stringify(dict)}).then(function (response) {
+            for (let i = 0; i < response.data["images"].length; i++) {
+              imported.push("data:image/jpeg;base64," + response.data["images"][i]);
             }
             return imported;
           });
@@ -60,15 +61,15 @@ export default {
           else
             this.displayed_imported_images = imported.slice(0, 4);
         },
-        async loadAnnotatedImages()
-        {
-          const dict = {"login": app.config.globalProperties.$login.value, "password":app.config.globalProperties.$password.value};
+        async loadAnnotatedImages() {
+          const dict = {
+            "login": app.config.globalProperties.$login.value,
+            "password": app.config.globalProperties.$password.value
+          };
           const annotated = [];
-          await axios.post("http://localhost:5000/get_annotated_images", {params:JSON.stringify(dict)}).then(function (response)
-          {
-            for (let i = 0; i < response.data["images"].length; i++)
-            {
-              annotated.push("data:image/jpeg;base64,"+response.data["images"][i]);
+          await axios.post("http://localhost:5000/get_annotated_images", {params: JSON.stringify(dict)}).then(function (response) {
+            for (let i = 0; i < response.data["images"].length; i++) {
+              annotated.push("data:image/jpeg;base64," + response.data["images"][i]);
             }
             return annotated;
           });
@@ -78,33 +79,59 @@ export default {
           else
             this.displayed_annotated_images = annotated.slice(0, 4);
         },
-        async loadMoreImported(e)
-        {
+        async loadMoreImported(e) {
           const length = this.displayed_imported_images.length;
-          if (length < 4)
-          {}
-          else if (this.imported.length < length + 4)
-              this.displayed_imported_images.push.apply(this.displayed_imported_images, this.imported.slice(length, this.imported.length));
+          if (length < 4) {
+          } else if (this.imported.length < length + 4)
+            this.displayed_imported_images.push.apply(this.displayed_imported_images, this.imported.slice(length, this.imported.length));
           else
             this.displayed_imported_images.push.apply(this.displayed_imported_images, this.imported.slice(length, length + 4));
         },
-        async selected(index)
-        {
-          const img = document.getElementById(index);
-          console.log(img.width, img.height);
-          this.context.drawImage(img, 0, 0, img.width * 3.33, img.height * 3.33);
-        }
+        async selected(index) {
+          this.current_img = document.getElementById(index);
+          this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
+        },
+        drawRectangle() {
+          let beginning_x = null;
+          let beginning_y = null;
+          let previous_x = null;
+          let previous_y = null;
+          this.context.lineWidth = 1;
+          let draw = false;
+          window.addEventListener("mousedown", (e) => draw = true);
+          window.addEventListener("mouseup", (e) =>
+          {
+            draw = false;
+          });
+          window.addEventListener("mousemove", (e) => {
+            if (previous_x == null || previous_y == null || !draw) {
+              beginning_x = e.offsetX;
+              beginning_y = e.offsetY;
+              previous_x = e.offsetX;
+              previous_y = e.offsetY;
+              return
+            }
+            let current_x = e.offsetX;
+            let current_y = e.offsetY;
+            //this.context.strokeStyle = "rgba(255, 0, 0)";
+            this.context.fillStyle = "rgba(255,0,0)";
+            this.context.globalAlpha = 0.4;
+            this.context.clearRect(beginning_x, beginning_y, previous_x - beginning_x, previous_y - beginning_y);
+            this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
+            this.context.strokeRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
+            //this.context.fillRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
+            //this.context.beginPath();
+            //this.context.stroke();
+
+            previous_x = current_x;
+            previous_y = current_y;
+          });
+        },
       },
       mounted()
       {
         this.canvas = document.getElementById("myCanvas");
         this.context = this.canvas.getContext("2d");
-        const current_img = null;
-        //window.onload = function() {
-        //  var img = document.getElementById("scream");
-        //  ctx.drawImage(img, 10, 10);
-        //};
-        //window.addEventListener("load", () =>this.processLoad())
       }
 }
 </script>
