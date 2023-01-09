@@ -2,25 +2,22 @@
 <template>
   <div id="edit">
     <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit"/>
+    <canvas id="myCanvas" width="666" height="500" style="border:5px solid red;"/>
     <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit"/>
-    <img :src="imported[0]" v-if="imported[0]" />
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
       <p>Wybierz zdjęcie do edycji</p>
-<!--
-          Tu miniaturki zdjęć:
-      <img :src="img_i" v-if="img_i"/>
--->
+      <ul>
+      <li v-for="(image, index) in displayed_imported_images" id="import_list">
+        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index)"/>
+      </li>
+      </ul>
 
-      <button id="moreL">Załaduj więcej</button>
+      <Button label="Załaduj więcej" @click="loadMoreImported()" id="moreL"/>
     </Sidebar>
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
-      <a href="#">About</a>
-      <a href="#">Services</a>
-      <a href="#">Clients</a>
-      <a href="#">Contact</a>
-      <img :src="img_a" v-if="img_a"/>
-      <button id="moreR">Załaduj więcej</button>
+      <Button label="Załaduj więcej" @click="visibleRight = true; loadAnnotatedImages();" id="moreR"/>
     </Sidebar>
+
   </div>
 </template>
 
@@ -32,14 +29,15 @@ export default {
   name: "Edit_images",
   data: function() {
     return {
-      info: "",
-      std:"",
-      img_i:"",
-      imn_a:"",
       visibleLeft:false,
       visibleRight:false,
       imported:[],
       annotated:[],
+      current_img: '',
+      displayed_imported_images:[],
+      displayed_annotated_images:[],
+      canvas:null,
+      context:null,
     }
   },
   methods:
@@ -57,6 +55,10 @@ export default {
             return imported;
           });
           this.imported = imported;
+          if (this.imported.length < 4)
+            this.displayed_imported_images = imported.slice(0, this.imported.length);
+          else
+            this.displayed_imported_images = imported.slice(0, 4);
         },
         async loadAnnotatedImages()
         {
@@ -71,13 +73,48 @@ export default {
             return annotated;
           });
           this.annotated = annotated;
+          if (this.annotated.length < 4)
+            this.displayed_annotated_images = annotated.slice(0, this.annotated.length);
+          else
+            this.displayed_annotated_images = annotated.slice(0, 4);
         },
+        async loadMoreImported(e)
+        {
+          const length = this.displayed_imported_images.length;
+          if (length < 4)
+          {}
+          else if (this.imported.length < length + 4)
+              this.displayed_imported_images.push.apply(this.displayed_imported_images, this.imported.slice(length, this.imported.length));
+          else
+            this.displayed_imported_images.push.apply(this.displayed_imported_images, this.imported.slice(length, length + 4));
+        },
+        async selected(index)
+        {
+          const img = document.getElementById(index);
+          console.log(img.width, img.height);
+          this.context.drawImage(img, 0, 0, img.width * 3.33, img.height * 3.33);
+        }
+      },
+      mounted()
+      {
+        this.canvas = document.getElementById("myCanvas");
+        this.context = this.canvas.getContext("2d");
+        const current_img = null;
+        //window.onload = function() {
+        //  var img = document.getElementById("scream");
+        //  ctx.drawImage(img, 10, 10);
+        //};
+        //window.addEventListener("load", () =>this.processLoad())
       }
 }
 </script>
 
 <style>
 
+ul
+{
+  list-style-tuple:none;
+}
 #edit{
   height: 100px;
 }
