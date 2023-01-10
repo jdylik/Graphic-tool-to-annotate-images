@@ -1,9 +1,13 @@
 
 <template>
   <div id="edit">
-    <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit"/>
     <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
-    <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit"/>
+    <div id="tools">
+      <Button label="Rysuj" @click="drawRectangle()" id="draw" class="tools"/>
+      <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit" class="tools"/>
+      <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit" class="tools"/>
+    </div>
+
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
       <p>Wybierz zdjęcie do edycji</p>
       <ul>
@@ -17,7 +21,7 @@
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
       <Button label="Załaduj więcej" @click="visibleRight = true; loadAnnotatedImages();" id="moreR"/>
     </Sidebar>
-     <Button label="Rysuj" @click="drawRectangle()" id="draw"/>
+
 
   </div>
 </template>
@@ -137,13 +141,39 @@ export default {
 </script>
 
 <style>
+canvas{
+  margin-left: auto;
+  margin-right: auto;
+}
+.tools {
+  height: 60px;
+  width: 220px;
+  padding: 5px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: steelblue;
+  border-radius: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.tools:hover {background-color: #2c3e50}
+
+.tools:active {
+  background-color: #2c3e50;
+  transform: translateY(4px);
+}
 
 ul
 {
   list-style-tuple:none;
 }
-#edit{
-  height: 100px;
+
+#tools{
+  padding: 10px;
 }
 
 #sidebar_left

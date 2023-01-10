@@ -4,16 +4,16 @@
       <h1>Narzędzie do adnotacji zdjęć na potrzeby algorytmu detekcji</h1>
     </div>
     <nav>
-      <button>
+      <button class="button">
         <router-link to="/login">Zaloguj się</router-link>
       </button>
-      <button>
+      <button class="button">
         <router-link to="/import">Importuj</router-link>
       </button>
-      <button>
+      <button class="button">
         <router-link to="/edit">Edytuj</router-link>
       </button>
-      <button>
+      <button class="button">
         <router-link to="/logout">Wyloguj się</router-link>
       </button>
 
@@ -40,11 +40,11 @@ nav {
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: white;
 }
 
 nav a.router-link-exact-active {
-  color: #42b983;
+  color: #6ce8ac;
 }
 
 #container {
@@ -78,16 +78,27 @@ nav a.router-link-exact-active {
 	background-color: black
 }
 
-button {
-  border: 3px solid black;
-  background-color: steelblue;
+.button {
   height: 50px;
   width: 150px;
+  padding: 5px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: steelblue;
+  border-radius: 15px;
   margin-left: 5px;
   margin-right: 5px;
-  font-size: large;
 }
 
+.button:hover {background-color: #2c3e50}
+
+.button:active {
+  background-color: #2c3e50;
+  transform: translateY(4px);
+}
 body {
 	overflow-x:hidden;
 }
