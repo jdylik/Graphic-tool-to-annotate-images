@@ -17,7 +17,7 @@ mysql = MySQL(app)
 def get_logins_and_passwords():
     cur = mysql.connection.cursor()
     try:
-        cur.execute("SELECT login, hasło from logowanie")
+        cur.execute("SELECT login, haslo from logowanie")
         logdata_list = cur.fetchall()
         cur.close()
         return json.dumps({"logdatalist": logdata_list}, ensure_ascii=False)
@@ -34,7 +34,7 @@ def insert_new_data():
     new_password = data.split("\"")[3]
     cur = mysql.connection.cursor()
     try:
-        cur.execute("INSERT INTO logowanie (login, hasło) VALUES (%s, %s)", (new_login, new_password))
+        cur.execute("INSERT INTO logowanie (login, haslo) VALUES (%s, %s)", (new_login, new_password))
         mysql.connection.commit()
         cur.close()
         return "Success"
@@ -53,10 +53,10 @@ def insert_new_image():
     password = data[2].split("\"")[3]
     cur = mysql.connection.cursor()
     try:
-        cur.execute("SELECT id FROM logowanie WHERE login = %s AND hasło = %s", (login, password))
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("INSERT INTO import (obraz, id_uż) VALUES (%s, %s)", (image, id))
+        cur.execute("INSERT INTO import (obraz, id_uz) VALUES (%s, %s)", (image, id))
         mysql.connection.commit()
         cur.close()
         return "Success"
@@ -73,10 +73,10 @@ def get_imported_images():
     password = data.split("\"")[7]
     cur = mysql.connection.cursor()
     try:
-        cur.execute("SELECT id FROM logowanie WHERE login = %s AND hasło = %s", (login, password))
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT obraz FROM import WHERE id_uż = %s", (id,))
+        cur.execute("SELECT obraz FROM import WHERE id_uz = %s", (id,))
         images = cur.fetchall()
         cur.close()
         return json.dumps({"images": images}, ensure_ascii=False)
@@ -93,7 +93,7 @@ def get_annotated_images():
     password = data.split("\"")[7]
     cur = mysql.connection.cursor()
     try:
-        cur.execute("SELECT id FROM logowanie WHERE login = %s AND hasło = %s", (login, password))
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
         cur.execute("SELECT obraz FROM zadnotowane WHERE id_u = %s", (id,))

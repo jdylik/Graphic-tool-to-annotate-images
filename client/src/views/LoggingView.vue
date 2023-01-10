@@ -61,6 +61,10 @@ export default {
             if (i === gObject["logdatalist"].length - 1)
               alert("Wygląda na to, że użytkownik o podanym loginie nie istnieje. Utwórz nowe konto!");
           }
+          if (gObject["logdatalist"].length === 0)
+          {
+            alert("Wygląda na to, że użytkownik o podanym loginie nie istnieje. Utwórz nowe konto!");
+          }
           this.user_login = '';
           this.user_password = '';
         },
