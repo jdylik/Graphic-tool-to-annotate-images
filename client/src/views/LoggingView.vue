@@ -24,7 +24,7 @@
 
 <script>
 
-import {app} from '../main.js';
+import {app} from '@/main';
 import router from '../router/index.js';
 import axios from 'axios';
 
@@ -41,7 +41,7 @@ export default {
     },
   methods:
       {
-        async try_to_log_in(e)
+        async try_to_log_in()
         {
           app.config.globalProperties.$is_allowed_to_log_in.value = false;
           const gResponse = await fetch("http://localhost:5000/get_logins_and_passwords");
@@ -64,7 +64,7 @@ export default {
           this.user_login = '';
           this.user_password = '';
         },
-        async try_to_sign_up(e)
+        async try_to_sign_up()
         {
           if (this.new_user_login.includes("\"") || this.new_user_password.includes("\"") || this.new_user_login === '' || this.new_user_password === '' || this.new_user_login.length > 15 || this.new_user_password.length > 15)
           {

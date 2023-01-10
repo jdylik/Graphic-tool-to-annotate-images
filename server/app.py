@@ -12,6 +12,7 @@ app.config['MYSQL_PASSWORD'] = '1234'
 app.config['MYSQL_DB'] = 'projekt_io'
 mysql = MySQL(app)
 
+
 @app.route('/get_logins_and_passwords')
 def get_logins_and_passwords():
     cur = mysql.connection.cursor()
@@ -22,7 +23,9 @@ def get_logins_and_passwords():
         return json.dumps({"logdatalist": logdata_list}, ensure_ascii=False)
     except Exception:
         cur.close()
-        return("Ojojoj")
+        return "Ojojoj"
+
+
 @app.route('/insert_new_data', methods=['POST'])
 def insert_new_data():
     data = request.json
@@ -34,10 +37,12 @@ def insert_new_data():
         cur.execute("INSERT INTO logowanie (login, hasło) VALUES (%s, %s)", (new_login, new_password))
         mysql.connection.commit()
         cur.close()
-        return("Success")
+        return "Success"
     except Exception:
         cur.close()
-        return("Ojojoj")
+        return "Ojojoj"
+
+
 @app.route('/insert_new_image', methods=['POST'])
 def insert_new_image():
     data = request.json
@@ -54,10 +59,12 @@ def insert_new_image():
         cur.execute("INSERT INTO import (obraz, id_uż) VALUES (%s, %s)", (image, id))
         mysql.connection.commit()
         cur.close()
-        return ("Success")
+        return "Success"
     except Exception:
         cur.close()
-        return ("Ojojoj")
+        return "Ojojoj"
+
+
 @app.route('/get_imported_images', methods=['POST'])
 def get_imported_images():
     data = request.json
@@ -75,7 +82,8 @@ def get_imported_images():
         return json.dumps({"images": images}, ensure_ascii=False)
     except Exception:
         cur.close()
-        return ("Ojojoj")
+        return "Ojojoj"
+
 
 @app.route('/get_annotated_images', methods=['POST'])
 def get_annotated_images():
@@ -94,7 +102,8 @@ def get_annotated_images():
         return json.dumps({"images": images}, ensure_ascii=False)
     except Exception:
         cur.close()
-        return ("Ojojoj")
+        return "Ojojoj"
+
 
 if __name__ == '__main__':
     app.run()
