@@ -2,12 +2,15 @@
 <template>
   <div id="edit">
     <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
-    <div id="tools">
+    <div id="row1">
       <Button label="Rysuj" @click="drawRectangle()" id="draw" class="tools"/>
+      <Button label="Usuń" @click="" class="tools"/>
+      <Button label="Zapisz" @click="" class="tools"/>
+
+    </div>
+    <div id="row2"></div>
       <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit" class="tools"/>
       <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit" class="tools"/>
-    </div>
-
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
       <p>Wybierz zdjęcie do edycji</p>
       <ul>
@@ -172,7 +175,7 @@ ul
   list-style-tuple:none;
 }
 
-#tools{
+#row1{
   padding: 10px;
 }
 

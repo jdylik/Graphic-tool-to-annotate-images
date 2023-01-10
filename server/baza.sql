@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 04 Sty 2023, 13:16
+-- Czas generowania: 10 Sty 2023, 12:01
 -- Wersja serwera: 10.4.27-MariaDB
 -- Wersja PHP: 8.1.12
 
@@ -26,14 +26,11 @@ SET time_zone = "+00:00";
 --
 -- Struktura tabeli dla tabeli `import`
 --
-CREATE DATABASE `PROJEKT_IO`;
-USE `PROJEKT_IO`;
-
 
 CREATE TABLE `import` (
   `id_o` int(11) NOT NULL,
-  `obraz` longtext NOT NULL,
-  `id_uż` int(11) NOT NULL
+  `obraz` mediumblob NOT NULL,
+  `id_uz` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -45,7 +42,7 @@ CREATE TABLE `import` (
 CREATE TABLE `logowanie` (
   `id` int(11) NOT NULL,
   `login` varchar(15) NOT NULL,
-  `hasło` varchar(15) NOT NULL
+  `haslo` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -56,7 +53,7 @@ CREATE TABLE `logowanie` (
 
 CREATE TABLE `zadnotowane` (
   `id_e` int(11) NOT NULL,
-  `obraz` longtext NOT NULL,
+  `obraz` mediumblob NOT NULL,
   `id_u` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -69,7 +66,7 @@ CREATE TABLE `zadnotowane` (
 --
 ALTER TABLE `import`
   ADD PRIMARY KEY (`id_o`),
-  ADD KEY `id_uż` (`id_uż`);
+  ADD KEY `id_uż` (`id_uz`);
 
 --
 -- Indeksy dla tabeli `logowanie`
@@ -114,13 +111,13 @@ ALTER TABLE `zadnotowane`
 -- Ograniczenia dla tabeli `import`
 --
 ALTER TABLE `import`
-  ADD CONSTRAINT `userIDfk` FOREIGN KEY (`id_uż`) REFERENCES `logowanie` (`id`);
+  ADD CONSTRAINT `userIDfk` FOREIGN KEY (`id_uz`) REFERENCES `logowanie` (`id`);
 
 --
 -- Ograniczenia dla tabeli `zadnotowane`
 --
 ALTER TABLE `zadnotowane`
-  ADD CONSTRAINT `userid_fk` FOREIGN KEY (`id_u`) REFERENCES `import` (`id_uż`);
+  ADD CONSTRAINT `userid_fk` FOREIGN KEY (`id_u`) REFERENCES `import` (`id_uz`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
