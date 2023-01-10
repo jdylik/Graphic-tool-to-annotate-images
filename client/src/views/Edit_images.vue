@@ -225,27 +225,53 @@ a{
   color: white;
 }
 
-#moreL{
+#moreL {
+  height: 60px;
+  width: 220px;
   position: fixed;
   bottom: 5px;
-  left: 6.5%;
-  color: white;
+  left: 3.5%;
+  padding: 5px;
+  font-size: 15px;
   text-align: center;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 4px;
-  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: steelblue;
+  border-radius: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
-#moreR{
+
+#moreL:hover {background-color: #2c3e50}
+
+#moreL:active {
+  background-color: #2c3e50;
+  transform: translateY(4px);
+}
+#moreR {
+  height: 60px;
+  width: 220px;
   position: fixed;
   bottom: 5px;
-  right: 6.5%;
-  color: white;
+  right: 3.5%;
+  padding: 5px;
+  font-size: 15px;
   text-align: center;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 4px;
-  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: steelblue;
+  border-radius: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#moreR:hover {background-color: #2c3e50}
+
+#moreR:active {
+  background-color: #2c3e50;
+  transform: translateY(4px);
 }
 
 a{
