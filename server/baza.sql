@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 10 Sty 2023, 12:01
+-- Czas generowania: 10 Sty 2023, 12:11
 -- Wersja serwera: 10.4.27-MariaDB
 -- Wersja PHP: 8.1.12
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `import` (
   `id_o` int(11) NOT NULL,
-  `obraz` mediumblob NOT NULL,
+  `obraz` longtext NOT NULL,
   `id_uz` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -53,7 +53,7 @@ CREATE TABLE `logowanie` (
 
 CREATE TABLE `zadnotowane` (
   `id_e` int(11) NOT NULL,
-  `obraz` mediumblob NOT NULL,
+  `obraz` longtext NOT NULL,
   `id_u` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
