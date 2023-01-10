@@ -4,18 +4,18 @@
   <button id="R" onclick="getElementById('rejestracja').style.display='block';getElementById('logowanie').style.display='none'">Rejestracja</button>
   <div id="logowanie">
     <label for="login_input">Login:</label>
-    <InputText id="login_input" v-model="user_login"/><br><br>
+    <InputText id="login_input" v-model="user_login" @keyup.enter.native="try_to_log_in()"/><br><br>
     <label for="password_input">Hasło:</label>
-    <input type="password" id="password_input" v-model="user_password"/><br><br>
+    <input type="password" id="password_input" v-model="user_password" @keyup.enter.native="try_to_log_in()"/><br><br>
     <Button label="Zaloguj się" @click="try_to_log_in()" id="submit"/>
   </div>
 
   <br/>
   <div id="rejestracja">
     <label for="new_login_input">Login:</label>
-    <InputText id="new_login_input" v-model="new_user_login"/><br><br>
+    <InputText id="new_login_input" v-model="new_user_login" @keyup.enter.native="try_to_sign_up()"/><br><br>
     <label for="new_password_input" >Hasło:</label>
-    <input type="password" id="new_password_input" v-model="new_user_password"/><br><br>
+    <input type="password" id="new_password_input" v-model="new_user_password" @keyup.enter.native="try_to_sign_up()"/><br><br>
     <Button label="Zarejestruj się" @click="try_to_sign_up()" id="submit"/>
   </div>
 
@@ -70,12 +70,22 @@ export default {
         },
         async try_to_sign_up()
         {
-          if (this.new_user_login.includes("\"") || this.new_user_password.includes("\"") || this.new_user_login === '' || this.new_user_password === '' || this.new_user_login.length > 15 || this.new_user_password.length > 15)
+          if (this.new_user_login === '' || this.new_user_password === '')
           {
-            alert("Pamiętaj, twój login i hasło nie mogą zawierać cudzysłowiu ani być puste, a także mieć więcej niż 15 znaków. Popraw dane i spróbuj ponownie!")
+            alert("Login i hasło nie mogą być puste!")
             return
           }
-          const gResponse = await fetch("http://localhost:5000/get_logins_and_passwords");
+          else if (this.new_user_login.length > 15 || this.new_user_password.length > 15)
+          {
+            alert("Login i hasło nie mogą mieć więcej niż 15 znaków!")
+          }
+          else if (this.new_user_login.includes("\"") || this.new_user_password.includes("\"") || this.new_user_login.includes("\\") ||this.new_user_password.includes("\\"))
+          {
+            alert("Wykorzystano niedozwolony znak. \n Nie używaj: \\, \".")
+            return
+          }
+          else
+          {const gResponse = await fetch("http://localhost:5000/get_logins_and_passwords");
           const gObject = await gResponse.json();
           if (gObject["logdatalist"].length === 0)
           {
@@ -97,7 +107,7 @@ export default {
             }
           }
           this.new_user_login = '';
-          this.new_user_password = '';
+          this.new_user_password = '';}
         },
       },
 }
