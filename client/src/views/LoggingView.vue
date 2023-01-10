@@ -112,37 +112,63 @@ export default {
 #rejestracja{
   display:none;
 }
-#L{
-  color: white;
+#L, #R {
+  height: 50px;
+  width: 150px;
+  padding: 5px;
+  font-size: 15px;
   text-align: center;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 4px;
-  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: steelblue;
+  border-radius: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
-#R{
-  color: white;
-  text-align: center;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 4px;
-  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+
+#L:hover {background-color: #2c3e50}
+
+#L:active {
+  background-color: #2c3e50;
+  transform: translateY(4px);
+}
+
+#R:hover {background-color: #2c3e50}
+
+#R:active {
+  background-color: #2c3e50;
+  transform: translateY(4px);
 }
 
 #Login{
   margin-left: auto;
   margin-right: auto;
   padding: 20px;
+
+}
+#submit{
+  height: 50px;
+  width: 150px;
+  padding: 5px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: steelblue;
+  border-radius: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
-#submit{
-  color: white;
-  text-align: center;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 4px;
-  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+#submit:hover {background-color: #2c3e50}
+
+#submit:active {
+  background-color: #2c3e50;
+  transform: translateY(4px);
 }
+
 label{
   margin-right: 10px;
 }
