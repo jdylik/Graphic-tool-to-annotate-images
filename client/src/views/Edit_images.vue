@@ -1,16 +1,20 @@
 
 <template>
-  <div id="edit">
+  <div id="pageWrap">
+
     <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
+
     <div id="row1">
       <Button label="Rysuj" @click="drawRectangle();" id="draw" class="tools"/>
       <Button label="Usuń" @click="" class="tools"/>
       <Button label="Zapisz" @click="" class="tools"/>
-
     </div>
-    <div id="row2"></div>
+
+    <div id="row2">
       <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit" class="tools"/>
       <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit" class="tools"/>
+    </div>
+
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
       <p>Wybierz zdjęcie do edycji</p>
       <ul>
@@ -18,9 +22,9 @@
         <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index)"/>
       </li>
       </ul>
-
       <Button label="Załaduj więcej" @click="loadMoreImported()" id="moreL"/>
     </Sidebar>
+
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
       <Button label="Załaduj więcej" @click="visibleRight = true; loadAnnotatedImages();" id="moreR"/>
     </Sidebar>
@@ -204,6 +208,7 @@ export default {
 </script>
 
 <style>
+
 canvas{
   margin-left: auto;
   margin-right: auto;

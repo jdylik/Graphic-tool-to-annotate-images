@@ -1,7 +1,7 @@
 <template xmlns="http://www.w3.org/1999/html">
   <div id="container">
     <div id="title">
-      <h1>Narzędzie do adnotacji zdjęć na potrzeby algorytmu detekcji</h1>
+      <h1>Narzędzie do adnotacji zdjęć na potrzeby algorytmów detekcji</h1>
     </div>
     <nav>
       <button class="button">
@@ -36,6 +36,7 @@
 
 nav {
   padding: 30px;
+
 }
 
 nav a {
@@ -52,6 +53,7 @@ nav a.router-link-exact-active {
 	height: 100%;
 	margin-left: auto;
 	margin-right: auto;
+  margin-bottom: -200px;
 }
 
 #title {
@@ -64,6 +66,13 @@ nav a.router-link-exact-active {
 	padding: 15px;
 	font-size: xx-large;
 	font-family: 'Audiowide', sans-serif;
+}
+
+footer {
+    clear: both;
+    position: sticky;
+    height: 200px;
+
 }
 
 #footer {

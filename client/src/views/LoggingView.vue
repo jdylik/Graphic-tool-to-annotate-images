@@ -158,8 +158,9 @@ export default {
 #Login{
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: -200px;
   padding: 20px;
-
+  min-height:100vh;
 }
 #submit{
   height: 50px;
