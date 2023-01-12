@@ -118,6 +118,19 @@ export default {
           this.context.clearRect(0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33)
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
         },
+        drawAllRects()
+        {
+          this.context.beginPath();
+          this.context.strokeStyle = "rgb(0, 0, 255)";
+          this.context.fillStyle = "rgba(255,0,0, 0.2)";
+          this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
+          for(let i = 0; i < this.rec_counter; i++)
+          {
+            this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
+            this.context.fillRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
+          }
+
+        },
         drawRectangle() {
           if (this.current_img != null ) {
             this.ifButtonDrawClicked = true;
@@ -139,32 +152,26 @@ export default {
             window.addEventListener("mouseup", (e) => {
               if (e.target.localName === 'canvas') {
                 is_rect_finished = true;
-              }
-                this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
                 this.rec_beg_x[this.rec_counter] = beginning_x;
                 this.rec_beg_y[this.rec_counter] = beginning_y;
                 this.rec_w[this.rec_counter] = previous_x - beginning_x;
-                this.rec_h[this.rec_counter]= previous_y - beginning_y;
+                this.rec_h[this.rec_counter] = previous_y - beginning_y;
                 this.rec_counter += 1;
-                for(let i = 0; i < this.rec_counter; i++)
-                {
-                  this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
-                  this.context.fillRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
-                }
+              }
+                this.drawAllRects();
+                this.context.stroke();
+                this.context.closePath();
                 //realnie po prawej  - dynamiczny podgląd
-                this.displayed_imported_images[this.indexOfCurrentImage] = document.getElementById('myCanvas').toDataURL('image/jpeg');
+              //wydaje się to jednak niepotrzebnym featurem - przycisk do zapisu po prostu wrzuci to zdjęcie na koniec zaadnotowanych
+                //this.displayed_imported_images[this.indexOfCurrentImage] = document.getElementById('myCanvas').toDataURL('image/jpeg');
                 draw = false;
             });
             window.addEventListener("mousemove", (e) => {
-              if (e.target.localName !== 'canvas' && !is_rect_finished)
-              {
+              if (e.target.localName !== 'canvas' && !is_rect_finished)   {
                 draw = false;
-                this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
-                for(let i = 0; i < this.rec_counter; i++)
-                {
-                  this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
-                  this.context.fillRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
-                }
+                this.drawAllRects();
+                this.context.stroke();
+                this.context.closePath();
                 return
               }
               if (previous_x == null || previous_y == null || !draw) {
@@ -176,17 +183,9 @@ export default {
               }
               let current_x = e.offsetX;
               let current_y = e.offsetY;
-              this.context.beginPath();
-              this.context.strokeStyle = "rgb(0, 0, 255)";
-              this.context.fillStyle = "rgba(255,0,0, 0.4)";
               //this.context.globalAlpha = 0.4;
               //this.context.clearRect(beginning_x, beginning_y, previous_x - beginning_x, previous_y - beginning_y);
-              this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
-              for(let i = 0; i < this.rec_counter; i++)
-              {
-                  this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
-                  this.context.fillRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
-              }
+              this.drawAllRects();
               this.context.strokeRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
               this.context.fillRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
               //this.context.beginPath();

@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95f3ab76-f589-4043-a8e6-d3219efc415a" name="Changes" comment="usunięcie polskich znaków w bazie">
-      <change beforePath="$PROJECT_DIR$/../client/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/App.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/views/Import_images.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/Import_images.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/views/LoggingView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/LoggingView.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,7 +47,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/studia/IO/Software-engineering-project/server",
+    "last_opened_file_path": "D:/Programowanie/Pycharm projects/Software-engineering-project/server/app.py",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -73,11 +70,12 @@
   <component name="RunManager">
     <configuration name="Flask (app.py)" type="Python.FlaskServer" nameIsGenerated="true">
       <module name="server" />
-      <option name="target" value="D:\studia\IO\Software-engineering-project\server\app.py" />
+      <option name="target" value="D:\Programowanie\Pycharm projects\Software-engineering-project\server\app.py" />
       <option name="targetType" value="PATH" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="C:\Users\Kasia\Desktop\server\Scripts\python.exe" />
+      <option name="SDK_HOME" value="D:\Programowanie\Pycharm projects\Interpreter11\Scripts\python.exe" />
+      <option name="SDK_NAME" value="Python 3.11 (Interpreter11) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -122,6 +120,7 @@
       <workItem from="1673351634624" duration="1141000" />
       <workItem from="1673423027019" duration="35000" />
       <workItem from="1673423070619" duration="606000" />
+      <workItem from="1673445663257" duration="636000" />
     </task>
     <task id="LOCAL-00001" summary="usunięcie polskich znaków w bazie">
       <created>1673348614589</created>
@@ -167,7 +166,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="longtexty" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673423080117" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673445699108" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$Flask.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673350456407" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$server.coverage" NAME="server Coverage Results" MODIFIED="1670847237825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
