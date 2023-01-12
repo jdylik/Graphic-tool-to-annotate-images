@@ -1,8 +1,8 @@
 <template>
 <div id="import">
-    <p>{{"Kliknij, jeżeli chcesz dodać folder zdjęć"}}</p>
+    <p>{{"Załaduj folder ze zdjęciami"}}</p>
     <input type="file" id="input_folder" @change="onFolder" webkitdirectory directory multiple/>
-    <p>{{"Kliknij, jeżeli chcesz dodać zdjęcie"}}</p>
+    <p>{{"Załaduj zdjęcie"}}</p>
     <input type="file" id="input_file" @change="onFile"/>
 </div>
 </template>
@@ -58,6 +58,8 @@ export default {
 p{
   padding: 15px;
   font-size: large;
+  color: #42b983;
+  margin-top: 30px;
 }
 input{
   font-size: medium;

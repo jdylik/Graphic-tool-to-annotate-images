@@ -19,10 +19,11 @@
 
     </nav>
     <router-view/>
-    <footer>
+    </div>
+  <footer>
       <div id="footer">&copy Katarzyna Prokop, Jan Dylik, Adrian Matlok, Michał Pluszczewski</div>
-    </footer>
-  </div>
+  </footer>
+
 </template>
 
 <style>
@@ -36,7 +37,6 @@
 
 nav {
   padding: 30px;
-
 }
 
 nav a {
@@ -50,10 +50,10 @@ nav a.router-link-exact-active {
 
 #container {
 	width: 100%;
-	height: 100%;
+  min-height:100vh;
 	margin-left: auto;
 	margin-right: auto;
-  margin-bottom: -200px;
+  position:relative
 }
 
 #title {
@@ -72,7 +72,6 @@ footer {
     clear: both;
     position: sticky;
     height: 200px;
-
 }
 
 #footer {
@@ -84,7 +83,8 @@ footer {
 	text-align: center;
 	font-family: 'Autowide', cursive;
 	padding: 10px;
-	background-color: black
+	background-color: black;
+  margin-bottom:-200px;
 }
 
 .button {
