@@ -35,6 +35,10 @@
   color: #2c3e50;
 }
 
+body{
+  background-image: url("background.jpg");
+}
+
 nav {
   padding: 30px;
 }
@@ -71,7 +75,7 @@ nav a.router-link-exact-active {
 footer {
     clear: both;
     position: sticky;
-    height: 200px;
+    height: 100px;
 }
 
 #footer {

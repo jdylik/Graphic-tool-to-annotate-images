@@ -211,6 +211,7 @@ export default {
 canvas{
   margin-left: auto;
   margin-right: auto;
+  background: white;
 }
 .tools {
   height: 60px;
@@ -250,6 +251,8 @@ ul
   color:#111;
   background-color: #2c3e50;
   text-align: center;
+  border-right: solid 2px;
+  border-bottom: solid 2px;
 }
 .p-sidebar-header{
   margin-left: auto;
@@ -268,6 +271,7 @@ ul
   margin: 4px 4px;
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
+
 #sidebar_right
 {
   width: 20%;
@@ -275,26 +279,32 @@ ul
   color:#111;
   background-color: #2c3e50;
   text-align: center;
+  border-left: solid 2px;
+  border-bottom: solid 2px;
 }
 
-.p-sidebar-close:before{
-  content: "X";
+.p-sidebar-right .p-sidebar-close:before{
+  content: "▶";
 }
 
+.p-sidebar-left .p-sidebar-close:before{
+  content: "◀";
+}
 
 p{
   color: white;
 }
+
 a{
   color: white;
 }
 
 #moreL {
-  height: 60px;
-  width: 220px;
+  height: 7%;
+  width: 10%;
   position: fixed;
   bottom: 5px;
-  left: 3.5%;
+  left: 4.7%;
   padding: 5px;
   font-size: 15px;
   text-align: center;
@@ -314,11 +324,11 @@ a{
   transform: translateY(4px);
 }
 #moreR {
-  height: 60px;
-  width: 220px;
+  height: 7%;
+  width: 10%;
   position: fixed;
   bottom: 5px;
-  right: 3.5%;
+  right: 4.7%;
   padding: 5px;
   font-size: 15px;
   text-align: center;
