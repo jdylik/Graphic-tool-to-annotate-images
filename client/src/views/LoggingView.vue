@@ -1,7 +1,7 @@
 <template>
 <div id="Login">
-  <button id="L" onclick="getElementById('logowanie').style.display='block';getElementById('rejestracja').style.display='none'" >Logowanie</button>
-  <button id="R" onclick="getElementById('rejestracja').style.display='block';getElementById('logowanie').style.display='none'">Rejestracja</button>
+  <button id="L" onclick="getElementById('logowanie').style.display='block';getElementById('rejestracja').style.display='none';getElementById('L').style.color='#6ce8ac'; getElementById('R').style.color='#FFFF'" >Logowanie</button>
+  <button id="R" onclick="getElementById('rejestracja').style.display='block';getElementById('logowanie').style.display='none';getElementById('R').style.color='#6ce8ac';getElementById('L').style.color='#FFFF'">Rejestracja</button>
   <div id="logowanie">
     <label for="login_input">Login:</label>
     <InputText id="login_input" v-model="user_login" @keyup.enter.native="try_to_log_in()"/><br><br>
@@ -16,7 +16,7 @@
     <InputText id="new_login_input" v-model="new_user_login" @keyup.enter.native="try_to_sign_up()"/><br><br>
     <label for="new_password_input" >Hasło:</label>
     <input type="password" id="new_password_input" v-model="new_user_password" @keyup.enter.native="try_to_sign_up()"/><br><br>
-    <Button label="Zarejestruj się" @click="try_to_sign_up()" id="submit"/>
+    <Button label="Zarejestruj się" @click="try_to_sign_up()" id="submit" onclick="getElementById('logowanie').style.display='block';getElementById('rejestracja').style.display='none'" />
   </div>
 
 </div>
@@ -103,6 +103,7 @@ export default {
                 this.new_data.push(this.new_user_login, this.new_user_password);
                 axios.post("http://localhost:5000/insert_new_data", {params: JSON.stringify(this.new_data)});
                 alert("Teraz możesz zalogować się na podane przez siebie dane.");
+
               }
             }
           }

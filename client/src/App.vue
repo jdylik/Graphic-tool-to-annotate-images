@@ -36,7 +36,10 @@
 }
 
 body{
-  background-image: url("background.jpg");
+  background: no-repeat center/140% url("background.jpg");
+  overflow-x: hidden;
+  height: 100%;
+  overflow-y: hidden;
 }
 
 nav {
@@ -72,12 +75,6 @@ nav a.router-link-exact-active {
 	font-family: 'Audiowide', sans-serif;
 }
 
-footer {
-    clear: both;
-    position: sticky;
-    height: 100px;
-}
-
 #footer {
 	position:absolute;
 	bottom:0px;
@@ -85,10 +82,9 @@ footer {
 	width:100%;
 	clear:both;
 	text-align: center;
-	font-family: 'Autowide', cursive;
-	padding: 10px;
-	background-color: black;
-  margin-bottom:-200px;
+	font-family: 'Courier New', monospace;
+	padding: .5em;
+	background-color: black
 }
 
 .button {
