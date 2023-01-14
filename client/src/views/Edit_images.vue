@@ -3,7 +3,13 @@
   <div id="pageWrap">
 
     <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
-
+    <!--ta lista poniżej ma się znaleźć obok canvasa-->
+    <ul>
+      <li v-for="(label, index) in labels" id="labels_list">
+        <span class="clr" style="color:red"></span>
+        <text>{{label}}</text>
+      </li>
+      </ul>
     <div id="row1">
       <Button label="Rysuj" @click="drawRectangle();" id="draw" class="tools"/>
       <Button label="Usuń" @click="deleteRectangle();" class="tools"/>
@@ -54,6 +60,8 @@ export default {
       rec_beg_y:[],
       rec_w:[],
       rec_h:[],
+      colors:['rgb(255,0,0)', 'rgb(0,128,0)'],
+      labels:['obiekt1', 'obiekt2'],
       rec_counter:0,
       ifButtonDrawClicked:false,
       ifButtonRemoveClicked:false,
@@ -128,10 +136,12 @@ export default {
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
           for(let i = 0; i < this.rec_counter; i++)
           {
-            this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
             this.context.fillRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
+            this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
+            this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], -20);
+            this.context.font = "15px Georgia";
+            this.context.fillText("Std", this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
           }
-
         },
         drawRectangle() {
             if (this.current_img != null) {
@@ -156,6 +166,7 @@ export default {
                 if (this.ifButtonDrawClicked === true) {
                   if (e.target.localName === 'canvas' && (((previous_x - beginning_x) * (previous_y - beginning_y) > 1000) || ((previous_x - beginning_x) * (previous_y - beginning_y) < -1000))) {
                     is_rect_finished = true;
+                    console.log(this.rec_beg_x);
                     if (this.rec_beg_x.indexOf(beginning_x) === -1 && this.rec_beg_y.indexOf(beginning_y) === -1) {
                       this.rec_beg_x[this.rec_counter] = beginning_x;
                       this.rec_beg_y[this.rec_counter] = beginning_y;
@@ -244,6 +255,15 @@ canvas{
   margin-left: auto;
   margin-right: auto;
   background: white;
+}
+.clr{
+    height: 20px;
+    width: 20px;
+    background-color: blue;
+    border-radius: 50%;
+    border: 3px solid rgb(214, 214, 214);
+    transition: transform .5s;
+    color:red;
 }
 .tools {
   height: 60px;
