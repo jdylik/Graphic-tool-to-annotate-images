@@ -6,7 +6,7 @@
 
     <div id="row1">
       <Button label="Rysuj" @click="drawRectangle();" id="draw" class="tools"/>
-      <Button label="Usuń" @click="" class="tools"/>
+      <Button label="Usuń" @click="deleteRectangle();" class="tools"/>
       <Button label="Zapisz" @click="" class="tools"/>
     </div>
 
@@ -56,6 +56,7 @@ export default {
       rec_h:[],
       rec_counter:0,
       ifButtonDrawClicked:false,
+      ifButtonRemoveClicked:false,
       indexOfCurrentImage:0,
     }
   },
@@ -113,6 +114,7 @@ export default {
           this.rec_w = [];
           this.rec_h = [];
           this.ifButtonDrawClicked = false;
+          this.ifButtonRemoveClicked = false;
           this.current_img = document.getElementById(index);
           this.context.globalAlpha = 1;
           this.context.clearRect(0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33)
@@ -132,71 +134,101 @@ export default {
 
         },
         drawRectangle() {
-          if (this.current_img != null ) {
-            this.ifButtonDrawClicked = true;
-            let beginning_x = null;
-            let beginning_y = null;
-            let previous_x = null;
-            let previous_y = null;
-            let current_x = null;
-            let current_y = null;
-            this.context.lineWidth = 1;
-            let draw = false;
-            let is_rect_finished = false;
-            window.addEventListener("mousedown", (e) => {
-              if (e.target.localName === 'canvas') {
-                is_rect_finished = false;
-                draw = true;
-              }
-            });
-            window.addEventListener("mouseup", (e) => {
-              if (e.target.localName === 'canvas') {
-                is_rect_finished = true;
-                this.rec_beg_x[this.rec_counter] = beginning_x;
-                this.rec_beg_y[this.rec_counter] = beginning_y;
-                this.rec_w[this.rec_counter] = previous_x - beginning_x;
-                this.rec_h[this.rec_counter] = previous_y - beginning_y;
-                this.rec_counter += 1;
-              }
-                this.drawAllRects();
-                this.context.stroke();
-                this.context.closePath();
-                //realnie po prawej  - dynamiczny podgląd
-              //wydaje się to jednak niepotrzebnym featurem - przycisk do zapisu po prostu wrzuci to zdjęcie na koniec zaadnotowanych
-                //this.displayed_imported_images[this.indexOfCurrentImage] = document.getElementById('myCanvas').toDataURL('image/jpeg');
-                draw = false;
-            });
-            window.addEventListener("mousemove", (e) => {
-              if (e.target.localName !== 'canvas' && !is_rect_finished)   {
-                draw = false;
-                this.drawAllRects();
-                this.context.stroke();
-                this.context.closePath();
-                return
-              }
-              if (previous_x == null || previous_y == null || !draw) {
-                beginning_x = e.offsetX;
-                beginning_y = e.offsetY;
-                previous_x = e.offsetX;
-                previous_y = e.offsetY;
-                return
-              }
-              let current_x = e.offsetX;
-              let current_y = e.offsetY;
-              //this.context.globalAlpha = 0.4;
-              //this.context.clearRect(beginning_x, beginning_y, previous_x - beginning_x, previous_y - beginning_y);
-              this.drawAllRects();
-              this.context.strokeRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
-              this.context.fillRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
-              //this.context.beginPath();
-              this.context.stroke();
-              this.context.closePath();
+            if (this.current_img != null) {
+              this.ifButtonDrawClicked = true;
+              this.ifButtonRemoveClicked = false;
+              let beginning_x = null;
+              let beginning_y = null;
+              let previous_x = null;
+              let previous_y = null;
+              let current_x = null;
+              let current_y = null;
+              this.context.lineWidth = 1;
+              let draw = false;
+              let is_rect_finished = false;
+              window.addEventListener("mousedown", (e) => {
+                if (e.target.localName === 'canvas' && this.ifButtonDrawClicked === true) {
+                  is_rect_finished = false;
+                  draw = true;
+                }
+              });
+              window.addEventListener("mouseup", (e) => {
+                if (this.ifButtonDrawClicked === true) {
+                  if (e.target.localName === 'canvas' && (((previous_x - beginning_x) * (previous_y - beginning_y) > 1000) || ((previous_x - beginning_x) * (previous_y - beginning_y) < -1000))) {
+                    is_rect_finished = true;
+                    if (this.rec_beg_x.indexOf(beginning_x) === -1 && this.rec_beg_y.indexOf(beginning_y) === -1) {
+                      this.rec_beg_x[this.rec_counter] = beginning_x;
+                      this.rec_beg_y[this.rec_counter] = beginning_y;
+                      this.rec_w[this.rec_counter] = previous_x - beginning_x;
+                      this.rec_h[this.rec_counter] = previous_y - beginning_y;
+                      this.rec_counter += 1;
+                    }
+                  }
+                  this.drawAllRects();
+                  this.context.stroke();
+                  this.context.closePath();
+                  //realnie po prawej  - dynamiczny podgląd
+                  //wydaje się to jednak niepotrzebnym featurem - przycisk do zapisu po prostu wrzuci to zdjęcie na koniec zaadnotowanych
+                  //this.displayed_imported_images[this.indexOfCurrentImage] = document.getElementById('myCanvas').toDataURL('image/jpeg');
+                  draw = false;
+                }
+              });
+              window.addEventListener("mousemove", (e) => {
+                if (this.ifButtonRemoveClicked !== true) {
+                  if (e.target.localName !== 'canvas' && !is_rect_finished) {
+                    draw = false;
+                    this.drawAllRects();
+                    this.context.stroke();
+                    this.context.closePath();
+                    return
+                  }
+                  if (previous_x == null || previous_y == null || !draw) {
+                    beginning_x = e.offsetX;
+                    beginning_y = e.offsetY;
+                    previous_x = e.offsetX;
+                    previous_y = e.offsetY;
+                    return
+                  }
+                  let current_x = e.offsetX;
+                  let current_y = e.offsetY;
+                  //this.context.globalAlpha = 0.4;
+                  //this.context.clearRect(beginning_x, beginning_y, previous_x - beginning_x, previous_y - beginning_y);
+                  this.drawAllRects();
+                  this.context.strokeRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
+                  this.context.fillRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
+                  //this.context.beginPath();
+                  this.context.stroke();
+                  this.context.closePath();
 
-              previous_x = current_x;
-              previous_y = current_y;
-            });
-          }
+                  previous_x = current_x;
+                  previous_y = current_y;
+                }
+              });
+            }
         },
+        deleteRectangle()
+        {
+          this.ifButtonRemoveClicked = true;
+          this.ifButtonDrawClicked = false;
+          window.addEventListener("click", (e) => {
+              if (e.target.localName === 'canvas' && this.ifButtonRemoveClicked === true) {
+                for (let i = this.rec_counter - 1; i > -1; i--)
+                {
+                  if (((e.offsetX >= this.rec_beg_x[i] && e.offsetX <= this.rec_beg_x[i] + this.rec_w[i])||(e.offsetX <= this.rec_beg_x[i] && e.offsetX >= this.rec_beg_x[i] + this.rec_w[i])) && ((e.offsetY >= this.rec_beg_y[i] && e.offsetY <= this.rec_beg_y[i] + this.rec_h[i])||(e.offsetY <= this.rec_beg_y[i] && e.offsetY >= this.rec_beg_y[i] + this.rec_h[i])))
+                  {
+                    this.rec_beg_x.splice(i, 1);
+                    this.rec_beg_y.splice(i, 1);
+                    this.rec_w.splice(i, 1);
+                    this.rec_h.splice(i, 1);
+                    this.rec_counter -= 1;
+                  }
+                }
+                this.drawAllRects();
+                this.context.stroke();
+                this.context.closePath();
+              }
+            });
+        }
       },
       mounted()
       {
