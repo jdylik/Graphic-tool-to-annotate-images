@@ -84,7 +84,7 @@ nav a.router-link-exact-active {
 	text-align: center;
 	font-family: 'Courier New', monospace;
 	padding: .5em;
-	background-color: black
+	background-color: black;
 }
 
 .button {
@@ -110,5 +110,9 @@ nav a.router-link-exact-active {
 }
 body {
 	overflow-x:hidden;
+}
+
+footer{
+    margin-top:5%;
 }
 </style>
