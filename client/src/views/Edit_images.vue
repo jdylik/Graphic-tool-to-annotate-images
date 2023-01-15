@@ -34,7 +34,13 @@
     </Sidebar>
 
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
-      <Button label="Załaduj więcej" @click="visibleRight = true; loadAnnotatedImages();" id="moreR"/>
+      <p>Wybierz zdjęcie do edycji</p>
+      <ul>
+      <li v-for="(image, index) in displayed_annotated_images" id="import_list">
+        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index)"/>
+      </li>
+      </ul>
+      <Button label="Załaduj więcej" @click="loadMoreAnnotated()" id="moreR"/>
     </Sidebar>
 
 
@@ -160,6 +166,14 @@ export default {
             this.displayed_imported_images.push.apply(this.displayed_imported_images, this.imported.slice(length, this.imported.length));
           else
             this.displayed_imported_images.push.apply(this.displayed_imported_images, this.imported.slice(length, length + 4));
+        },
+        async loadMoreAnnotated(e) {
+          const length = this.displayed_annotated_images.length;
+          if (length < 4) {
+          } else if (this.annotated.length < length + 4)
+            this.displayed_annotated_images.push.apply(this.displayed_annotated_images, this.annotated.slice(length, this.annotated.length));
+          else
+            this.displayed_annotated_images.push.apply(this.displayed_annotated_images, this.annotated.slice(length, length + 4));
         },
         async selected(index) {
           this.indexOfCurrentImage = index;

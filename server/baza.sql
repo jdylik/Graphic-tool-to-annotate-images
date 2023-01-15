@@ -30,7 +30,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `import` (
   `id_o` int(11) NOT NULL,
   `obraz` longtext NOT NULL,
-  `id_uz` int(11) NOT NULL
+  `id_uz` int(11) NOT NULL,
+  `czy_adnotacja` tinyint(1) DEFAULT 0 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -43,18 +44,6 @@ CREATE TABLE `logowanie` (
   `id` int(11) NOT NULL,
   `login` varchar(15) NOT NULL,
   `haslo` varchar(15) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struktura tabeli dla tabeli `zadnotowane`
---
-
-CREATE TABLE `zadnotowane` (
-  `id_e` int(11) NOT NULL,
-  `obraz` longtext NOT NULL,
-  `id_u` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -75,13 +64,6 @@ ALTER TABLE `logowanie`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeksy dla tabeli `zadnotowane`
---
-ALTER TABLE `zadnotowane`
-  ADD PRIMARY KEY (`id_e`),
-  ADD KEY `id_u` (`id_u`);
-
---
 -- AUTO_INCREMENT dla zrzuconych tabel
 --
 
@@ -98,12 +80,6 @@ ALTER TABLE `logowanie`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT dla tabeli `zadnotowane`
---
-ALTER TABLE `zadnotowane`
-  MODIFY `id_e` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- Ograniczenia dla zrzutów tabel
 --
 
@@ -112,13 +88,8 @@ ALTER TABLE `zadnotowane`
 --
 ALTER TABLE `import`
   ADD CONSTRAINT `userIDfk` FOREIGN KEY (`id_uz`) REFERENCES `logowanie` (`id`);
-
---
--- Ograniczenia dla tabeli `zadnotowane`
---
-ALTER TABLE `zadnotowane`
-  ADD CONSTRAINT `userid_fk` FOREIGN KEY (`id_u`) REFERENCES `import` (`id_uz`);
 COMMIT;
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

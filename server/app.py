@@ -76,7 +76,7 @@ def get_imported_images():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT obraz FROM import WHERE id_uz = %s", (id,))
+        cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id,0))
         images = cur.fetchall()
         cur.close()
         return json.dumps({"images": images}, ensure_ascii=False)
@@ -96,7 +96,7 @@ def get_annotated_images():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT obraz FROM zadnotowane WHERE id_u = %s", (id,))
+        cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id,1))
         images = cur.fetchall()
         cur.close()
         return json.dumps({"images": images}, ensure_ascii=False)
