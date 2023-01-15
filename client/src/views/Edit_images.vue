@@ -23,8 +23,8 @@
     </div>
 
     <div id="row2">
-      <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; loadImportedImages();" id="edit" class="tools"/>
-      <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true; loadAnnotatedImages();" id="edit" class="tools"/>
+      <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; visibleRight = false; loadImportedImages();" id="edit" class="tools"/>
+      <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true;visibleLeft = false; loadAnnotatedImages();" id="edit" class="tools"/>
     </div>
 
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
@@ -40,7 +40,7 @@
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
       <p>Wybierz zdjęcie do edycji</p>
       <ul>
-      <li v-for="(image, index) in displayed_annotated_images" id="import_list">
+      <li v-for="(image, index) in displayed_annotated_images" id="annotated_list">
         <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index)"/>
       </li>
       </ul>
