@@ -39,7 +39,7 @@ body{
   background: no-repeat center/140% url("background.jpg");
   overflow-x: hidden;
   height: 100%;
-  overflow-y: hidden;
+
 }
 
 nav {
@@ -76,7 +76,7 @@ nav a.router-link-exact-active {
 }
 
 #footer {
-	position:absolute;
+	position:fixed;
 	bottom:0px;
   color: aliceblue;
 	width:100%;

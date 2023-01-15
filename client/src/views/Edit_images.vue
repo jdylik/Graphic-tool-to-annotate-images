@@ -1,17 +1,21 @@
 
 <template>
   <div id="pageWrap">
+    <div id="kanwas">
+      <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
+      <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
+      <div id="lista">
+        <p>{{"Określ typ adnotowanego obiektu"}}</p>
+        <input type="text" id="object_type" v-on:keyup.enter="onEnter"/>
+        <ul>
+          <li v-for="(value, index) in unique_labels">
+          <!--<span class="clr" style="color:red"></span>-->
+            {{ value }}
+          </li>
+        </ul>
+      </div>
 
-    <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
-    <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
-    <p>{{"Określ typ adnotowanego obiektu"}}</p>
-    <input type="text" id="object_type" v-on:keyup.enter="onEnter"/>
-    <ul>
-      <li v-for="(value, index) in unique_labels">
-        <!--<span class="clr" style="color:red"></span>-->
-        {{ value }}
-      </li>
-      </ul>
+    </div>
     <div id="row1">
       <Button label="Rysuj" @click="drawRectangle();" id="draw" class="tools"/>
       <Button label="Usuń" @click="deleteRectangle();" class="tools"/>
@@ -333,9 +337,18 @@ export default {
 <style>
 
 canvas{
-  margin-left: auto;
-  margin-right: auto;
   background: white;
+}
+
+#lista p{
+  color: black;
+}
+
+#kanwas{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .clr{
     height: 20px;
