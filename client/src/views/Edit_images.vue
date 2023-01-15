@@ -3,11 +3,13 @@
   <div id="pageWrap">
 
     <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
-    <!--ta lista poniżej ma się znaleźć obok canvasa-->
+    <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
+    <p>{{"Określ typ adnotowanego obiektu"}}</p>
+    <input type="text" id="object_type" v-on:keyup.enter="onEnter"/>
     <ul>
-      <li v-for="(label, index) in labels" id="labels_list">
-        <span class="clr" style="color:red"></span>
-        <text>{{label}}</text>
+      <li v-for="(value, index) in unique_labels">
+        <!--<span class="clr" style="color:red"></span>-->
+        {{ value }}
       </li>
       </ul>
     <div id="row1">
@@ -61,15 +63,60 @@ export default {
       rec_w:[],
       rec_h:[],
       colors:['rgb(255,0,0)', 'rgb(0,128,0)'],
-      labels:['obiekt1', 'obiekt2'],
+      current_label:'',
+      labels:[],
+      labels_counter:[],
       rec_counter:0,
       ifButtonDrawClicked:false,
       ifButtonRemoveClicked:false,
       indexOfCurrentImage:0,
+      new_rect:false,
+      is_rect_finished:false,
+      previous_label:'',
+      edition_count:0,
+      unique_labels:[],
+      nr_labels:[],
     }
   },
   methods:
       {
+        onEnter:function()
+          {
+            if (this.is_rect_finished) {
+              this.current_label = document.getElementById("object_type").value;
+              document.getElementById("object_type").value = '';
+              this.labels.push(this.current_label);
+              this.drawAllRects();
+              if (Object.keys(this.labels_counter).length === 0) {
+                this.labels_counter[this.current_label] = 1;
+              }
+              else {
+                if (this.current_label in this.labels_counter)
+                  this.labels_counter[this.current_label] += 1;
+                else
+                  this.labels_counter[this.current_label] = 1;
+                if (this.previous_label !== '' && this.previous_label !== this.current_label && this.edition_count !== 0) {
+                  if (this.labels_counter[this.previous_label] === 1)
+                    delete this.labels_counter[this.previous_label];
+                  else
+                    this.labels_counter[this.previous_label] -= 1;
+                  this.labels.splice(this.labels.indexOf(this.previous_label), 1);
+                }
+              }
+              this.previous_label = this.current_label;
+              this.edition_count += 1;
+              this.unique_labels = [];
+              this.nr_labels = [];
+              for (let key in this.labels_counter) {
+                if (this.labels_counter.hasOwnProperty(key)) {
+                  this.unique_labels.push(key);
+                  this.nr_labels.push(this.current_label[key]);
+    }
+}
+            }
+            else
+              document.getElementById("object_type").value = '';
+            },
         async loadImportedImages() {
           const dict = {
             "login": app.config.globalProperties.$login.value,
@@ -140,7 +187,10 @@ export default {
             this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
             this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], -20);
             this.context.font = "15px Georgia";
-            this.context.fillText("Std", this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
+            if (this.labels[i] === undefined)
+              this.context.fillText('', this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
+            else
+              this.context.fillText(this.labels[i], this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
           }
         },
         drawRectangle() {
@@ -155,18 +205,20 @@ export default {
               let current_y = null;
               this.context.lineWidth = 1;
               let draw = false;
-              let is_rect_finished = false;
+              this.is_rect_finished = false;
               window.addEventListener("mousedown", (e) => {
                 if (e.target.localName === 'canvas' && this.ifButtonDrawClicked === true) {
-                  is_rect_finished = false;
+                  this.edition_count = 0;
+                  this.new_rect = true;
+                  this.is_rect_finished = false;
                   draw = true;
                 }
               });
               window.addEventListener("mouseup", (e) => {
+                this.new_rect = false;
                 if (this.ifButtonDrawClicked === true) {
                   if (e.target.localName === 'canvas' && (((previous_x - beginning_x) * (previous_y - beginning_y) > 1000) || ((previous_x - beginning_x) * (previous_y - beginning_y) < -1000))) {
-                    is_rect_finished = true;
-                    console.log(this.rec_beg_x);
+                    this.is_rect_finished = true;
                     if (this.rec_beg_x.indexOf(beginning_x) === -1 && this.rec_beg_y.indexOf(beginning_y) === -1) {
                       this.rec_beg_x[this.rec_counter] = beginning_x;
                       this.rec_beg_y[this.rec_counter] = beginning_y;
@@ -186,7 +238,7 @@ export default {
               });
               window.addEventListener("mousemove", (e) => {
                 if (this.ifButtonRemoveClicked !== true) {
-                  if (e.target.localName !== 'canvas' && !is_rect_finished) {
+                  if (e.target.localName !== 'canvas' && !this.is_rect_finished) {
                     draw = false;
                     this.drawAllRects();
                     this.context.stroke();
@@ -231,6 +283,21 @@ export default {
                     this.rec_beg_y.splice(i, 1);
                     this.rec_w.splice(i, 1);
                     this.rec_h.splice(i, 1);
+                    if (this.labels_counter[this.labels[i]] > 1)
+                    {
+                      this.labels_counter[this.labels[i]] -= 1;
+                    }
+                    else {
+                      delete this.labels_counter[this.labels[i]];
+                    }
+                    this.unique_labels = [];
+                    this.nr_labels = [];
+                    for (let key in this.labels_counter) {
+                      if (this.labels_counter.hasOwnProperty(key)) {
+                        this.unique_labels.push(key);
+                        this.nr_labels.push(this.current_label[key]);
+                      }
+                    }
                     this.rec_counter -= 1;
                   }
                 }
