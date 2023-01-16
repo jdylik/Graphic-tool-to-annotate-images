@@ -90,17 +90,20 @@ export default {
   },
   methods:
       {
-        onEnter:function()
-          {
+        onEnter:function() {
+          if (document.getElementById("object_type").value !== '') {
             if (this.is_rect_finished) {
               this.current_label = document.getElementById("object_type").value;
               document.getElementById("object_type").value = '';
+              console.log(this.labels);
+              if (this.edition_count !== 0)
+                this.labels.splice(this.labels.length - 1, 1);
               this.labels.push(this.current_label);
+              console.log(this.labels);
               this.drawAllRects();
               if (Object.keys(this.labels_counter).length === 0) {
                 this.labels_counter[this.current_label] = 1;
-              }
-              else {
+              } else {
                 if (this.current_label in this.labels_counter)
                   this.labels_counter[this.current_label] += 1;
                 else
@@ -110,7 +113,6 @@ export default {
                     delete this.labels_counter[this.previous_label];
                   else
                     this.labels_counter[this.previous_label] -= 1;
-                  this.labels.splice(this.labels.indexOf(this.previous_label), 1);
                 }
               }
               this.previous_label = this.current_label;
@@ -121,12 +123,12 @@ export default {
                 if (this.labels_counter.hasOwnProperty(key)) {
                   this.unique_labels.push(key);
                   this.nr_labels.push(this.current_label[key]);
-    }
-}
-            }
-            else
+                }
+              }
+            } else
               document.getElementById("object_type").value = '';
-            },
+          }
+        },
         async loadImportedImages() {
           const dict = {
             "login": app.config.globalProperties.$login.value,
@@ -186,6 +188,11 @@ export default {
           this.rec_beg_y = [];
           this.rec_w = [];
           this.rec_h = [];
+          this.labels = [];
+          this.current_label = '';
+          this.labels_counter = [];
+          this.unique_labels = [];
+          this.nr_labels = [];
           this.ifButtonDrawClicked = false;
           this.ifButtonRemoveClicked = false;
           this.current_img = document.getElementById(index);
@@ -225,6 +232,16 @@ export default {
               let draw = false;
               this.is_rect_finished = false;
               window.addEventListener("mousedown", (e) => {
+                if (this.rec_beg_x.length !== this.labels.length && e.target.localName === 'canvas') {
+                  this.rec_beg_x.splice(this.rec_beg_x.length - 1, 1);
+                  this.rec_beg_y.splice(this.rec_beg_x.length - 1, 1);
+                  this.rec_w.splice(this.rec_beg_x.length - 1, 1);
+                  this.rec_h.splice(this.rec_beg_x.length - 1, 1);
+                  this.rec_counter -= 1;
+                  this.drawAllRects();
+                  this.context.stroke();
+                  this.context.closePath();
+                }
                 if (e.target.localName === 'canvas' && this.ifButtonDrawClicked === true) {
                   this.edition_count = 0;
                   this.new_rect = true;
@@ -233,25 +250,28 @@ export default {
                 }
               });
               window.addEventListener("mouseup", (e) => {
-                this.new_rect = false;
-                if (this.ifButtonDrawClicked === true) {
-                  if (e.target.localName === 'canvas' && (((previous_x - beginning_x) * (previous_y - beginning_y) > 1000) || ((previous_x - beginning_x) * (previous_y - beginning_y) < -1000))) {
-                    this.is_rect_finished = true;
-                    if (this.rec_beg_x.indexOf(beginning_x) === -1 && this.rec_beg_y.indexOf(beginning_y) === -1) {
-                      this.rec_beg_x[this.rec_counter] = beginning_x;
-                      this.rec_beg_y[this.rec_counter] = beginning_y;
-                      this.rec_w[this.rec_counter] = previous_x - beginning_x;
-                      this.rec_h[this.rec_counter] = previous_y - beginning_y;
-                      this.rec_counter += 1;
+                if (e.target.localName === 'canvas') {
+                  this.new_rect = false;
+                  if (this.ifButtonDrawClicked === true) {
+                    if ((((previous_x - beginning_x) * (previous_y - beginning_y) > 1000) || ((previous_x - beginning_x) * (previous_y - beginning_y) < -1000))) {
+                      this.is_rect_finished = true;
+                      if (this.rec_beg_x.indexOf(beginning_x) === -1 && this.rec_beg_y.indexOf(beginning_y) === -1) {
+                        this.rec_beg_x[this.rec_counter] = beginning_x;
+                        this.rec_beg_y[this.rec_counter] = beginning_y;
+                        this.rec_w[this.rec_counter] = previous_x - beginning_x;
+                        this.rec_h[this.rec_counter] = previous_y - beginning_y;
+                        this.rec_counter += 1;
+                      }
                     }
-                  }
-                  this.drawAllRects();
-                  this.context.stroke();
-                  this.context.closePath();
-                  //realnie po prawej  - dynamiczny podgląd
-                  //wydaje się to jednak niepotrzebnym featurem - przycisk do zapisu po prostu wrzuci to zdjęcie na koniec zaadnotowanych
-                  //this.displayed_imported_images[this.indexOfCurrentImage] = document.getElementById('myCanvas').toDataURL('image/jpeg');
-                  draw = false;
+                    this.drawAllRects();
+                    this.context.stroke();
+                    this.context.closePath();
+                    //realnie po prawej  - dynamiczny podgląd
+                    //wydaje się to jednak niepotrzebnym featurem - przycisk do zapisu po prostu wrzuci to zdjęcie na koniec zaadnotowanych
+                    //this.displayed_imported_images[this.indexOfCurrentImage] = document.getElementById('myCanvas').toDataURL('image/jpeg');
+                    draw = false;
+                  } else
+                    draw = false;
                 }
               });
               window.addEventListener("mousemove", (e) => {
@@ -308,6 +328,7 @@ export default {
                     else {
                       delete this.labels_counter[this.labels[i]];
                     }
+                    this.labels.splice(this.labels.indexOf(this.labels[i]), 1);
                     this.unique_labels = [];
                     this.nr_labels = [];
                     for (let key in this.labels_counter) {
