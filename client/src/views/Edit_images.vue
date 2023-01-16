@@ -7,10 +7,10 @@
       <div id="lista">
         <p>{{"Określ typ adnotowanego obiektu"}}</p>
         <input type="text" id="object_type" v-on:keyup.enter="onEnter"/>
-        <ul>
-          <li v-for="(value, index) in unique_labels">
+        <ul id="typy">
+          <li v-for="(value, index) in unique_labels"  id="kolko">
           <!--<span class="clr" style="color:red"></span>-->
-            {{ value }}
+            <span>{{ value }}</span>
           </li>
         </ul>
       </div>
@@ -428,6 +428,23 @@ canvas{
 ul
 {
   list-style-tuple:none;
+}
+
+#typy{
+  list-style: circle;
+  width: 20%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5px;
+}
+
+#typy li{
+  margin-top: 10px;
+  color: black;
+}
+
+#typy li span{
+  color: black;
 }
 
 #row1{
