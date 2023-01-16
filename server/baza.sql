@@ -91,7 +91,9 @@ ALTER TABLE `import`
 
 CREATE TABLE info (
     `id_o` int(11) NOT NULL,
-    `atrybuty` JSON NOT NULL
+    `rodz_kam` varchar(50),
+    `pochodzenie` varchar(50),
+    `nazwa_pliku` varchar(255) NOT NULL
 );
 
 ALTER TABLE `info`
@@ -99,18 +101,23 @@ ALTER TABLE `info`
 
 CREATE TABLE kategorie (
     `id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `nazwa` char(50) NOT NULL,
-    `kat_info` JSON NOT NULL
+    `nazwa` char(50) NOT NULL
 );
 
 CREATE TABLE adnotacje (
     `id_adn` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `id_kat` int NOT NULL,
-    `atrybuty` JSON NOT NULL
+    `id_o` int NOT NULL,
+    `x_start` int NOT NULL,
+    `y_start` int NOT NULL,
+    `szer` int NOT NULL,
+    `wys` int NOT NULL
 );
 
 ALTER TABLE `adnotacje`
   ADD CONSTRAINT `annoIDfk` FOREIGN KEY (`id_kat`) REFERENCES `kategorie` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `adnotacje`
+  ADD CONSTRAINT `imgIDfk2` FOREIGN KEY (`id_o`) REFERENCES `import` (`id_o`) ON DELETE RESTRICT ON UPDATE CASCADE;
 COMMIT;
 
 
