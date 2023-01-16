@@ -88,6 +88,29 @@ ALTER TABLE `logowanie`
 --
 ALTER TABLE `import`
   ADD CONSTRAINT `userIDfk` FOREIGN KEY (`id_uz`) REFERENCES `logowanie` (`id`);
+
+CREATE TABLE info (
+    `id_o` int(11) NOT NULL,
+    `atrybuty` JSON NOT NULL
+);
+
+ALTER TABLE `info`
+  ADD CONSTRAINT `imgIDfk` FOREIGN KEY (`id_o`) REFERENCES `import` (`id_o`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+CREATE TABLE kategorie (
+    `id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `nazwa` char(50) NOT NULL,
+    `kat_info` JSON NOT NULL
+);
+
+CREATE TABLE adnotacje (
+    `id_adn` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `id_kat` int NOT NULL,
+    `atrybuty` JSON NOT NULL
+);
+
+ALTER TABLE `adnotacje`
+  ADD CONSTRAINT `annoIDfk` FOREIGN KEY (`id_kat`) REFERENCES `kategorie` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 COMMIT;
 
 
