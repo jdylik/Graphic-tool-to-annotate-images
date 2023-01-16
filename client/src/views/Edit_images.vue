@@ -95,11 +95,9 @@ export default {
             if (this.is_rect_finished) {
               this.current_label = document.getElementById("object_type").value;
               document.getElementById("object_type").value = '';
-              console.log(this.labels);
               if (this.edition_count !== 0)
                 this.labels.splice(this.labels.length - 1, 1);
               this.labels.push(this.current_label);
-              console.log(this.labels);
               this.drawAllRects();
               if (Object.keys(this.labels_counter).length === 0) {
                 this.labels_counter[this.current_label] = 1;
@@ -195,6 +193,8 @@ export default {
           this.nr_labels = [];
           this.ifButtonDrawClicked = false;
           this.ifButtonRemoveClicked = false;
+          this.is_rect_finished = false;
+          this.previous_label = '';
           this.current_img = document.getElementById(index);
           this.context.globalAlpha = 1;
           this.context.clearRect(0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33)
@@ -210,13 +210,36 @@ export default {
           {
             this.context.fillRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
             this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
-            this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], -20);
+            if (this.rec_w[i] > 0 && this.rec_h[i] > 0)
+              this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], -20);
+            else if (this.rec_w[i] > 0 && this.rec_h[i] < 0)
+              this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i] + this.rec_h[i], this.rec_w[i], -20);
+            else if (this.rec_w[i] < 0 && this.rec_h[i] > 0)
+              this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], -20);
+            else if (this.rec_w[i] < 0 && this.rec_h[i] < 0)
+              this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i] + this.rec_h[i], this.rec_w[i], -20);
             this.context.font = "15px Georgia";
-            if (this.labels[i] === undefined)
-              this.context.fillText('', this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
-            else
-              this.context.fillText(this.labels[i], this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
-          }
+            if (this.labels[i] === undefined) {
+              if (this.rec_w[i] > 0 && this.rec_h[i] > 0)
+                this.context.fillText('', this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
+              else if (this.rec_w[i] > 0 && this.rec_h[i] < 0)
+                  this.context.fillText('', this.rec_beg_x[i] + 5, this.rec_beg_y[i]+ this.rec_h[i] - 5);
+              else if (this.rec_w[i] < 0 && this.rec_h[i] > 0)
+                  this.context.fillText('', this.rec_beg_x[i] + this.rec_w[i] + 5, this.rec_beg_y[i] - 5);
+              else if (this.rec_w[i] < 0 && this.rec_h[i] < 0)
+                  this.context.fillText('', this.rec_beg_x[i] + this.rec_w[i] + 5, this.rec_beg_y[i] + this.rec_h[i] - 5);
+            }
+            else {
+              if (this.rec_w[i] > 0 && this.rec_h[i] > 0)
+                this.context.fillText(this.labels[i], this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
+              else if (this.rec_w[i] > 0 && this.rec_h[i] < 0)
+                  this.context.fillText(this.labels[i], this.rec_beg_x[i] + 5, this.rec_beg_y[i]+ this.rec_h[i] - 5);
+              else if (this.rec_w[i] < 0 && this.rec_h[i] > 0)
+                  this.context.fillText(this.labels[i], this.rec_beg_x[i] + this.rec_w[i] + 5, this.rec_beg_y[i] - 5);
+              else if (this.rec_w[i] < 0 && this.rec_h[i] < 0)
+                  this.context.fillText(this.labels[i], this.rec_beg_x[i] + this.rec_w[i] + 5, this.rec_beg_y[i] + this.rec_h[i] - 5);
+            }
+            }
         },
         drawRectangle() {
             if (this.current_img != null) {
@@ -233,16 +256,16 @@ export default {
               this.is_rect_finished = false;
               window.addEventListener("mousedown", (e) => {
                 if (this.rec_beg_x.length !== this.labels.length && e.target.localName === 'canvas') {
-                  this.rec_beg_x.splice(this.rec_beg_x.length - 1, 1);
-                  this.rec_beg_y.splice(this.rec_beg_x.length - 1, 1);
-                  this.rec_w.splice(this.rec_beg_x.length - 1, 1);
-                  this.rec_h.splice(this.rec_beg_x.length - 1, 1);
+                  this.rec_beg_x.pop();
+                  this.rec_beg_y.pop();
+                  this.rec_w.pop();
+                  this.rec_h.pop();
                   this.rec_counter -= 1;
                   this.drawAllRects();
                   this.context.stroke();
                   this.context.closePath();
                 }
-                if (e.target.localName === 'canvas' && this.ifButtonDrawClicked === true) {
+                if (e.target.localName === 'canvas' && this.ifButtonDrawClicked === true && this.labels[this.rec_counter - 1] !== '') {
                   this.edition_count = 0;
                   this.new_rect = true;
                   this.is_rect_finished = false;
@@ -276,7 +299,7 @@ export default {
               });
               window.addEventListener("mousemove", (e) => {
                 if (this.ifButtonRemoveClicked !== true) {
-                  if (e.target.localName !== 'canvas' && !this.is_rect_finished) {
+                  if ((e.target.localName !== 'canvas' || e.offsetY - 20 < 0) && !this.is_rect_finished) {
                     draw = false;
                     this.drawAllRects();
                     this.context.stroke();
