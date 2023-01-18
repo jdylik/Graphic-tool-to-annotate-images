@@ -19,7 +19,7 @@
     <div id="row1">
       <Button label="Rysuj" @click="drawRectangle();" id="draw" class="tools"/>
       <Button label="Usuń" @click="deleteRectangle();" class="tools"/>
-      <Button label="Zapisz" @click="" class="tools"/>
+      <Button label="Zapisz" @click="saveAnnotations()" class="tools"/>
     </div>
 
     <div id="row2">
@@ -127,6 +127,22 @@ export default {
               document.getElementById("object_type").value = '';
           }
         },
+
+        async saveAnnotations() {
+          const dict = {
+            "login": app.config.globalProperties.$login.value,
+            "password": app.config.globalProperties.$password.value,
+            "labels": this.labels,
+            "image index": this.indexOfCurrentImage,
+            "rec_beg_x": this.rec_beg_x,
+            "rec_beg_y": this.rec_beg_y,
+            "rec_w": this.rec_w,
+            "rec_h": this.rec_h
+          };
+          await axios.post("http://localhost:5000/save_annotations", {params: JSON.stringify(dict)})
+          return "Ojojoj";
+        },
+
         async loadImportedImages() {
           const dict = {
             "login": app.config.globalProperties.$login.value,
