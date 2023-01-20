@@ -109,52 +109,38 @@ def get_annotated_images():
 def save_annotations():
     data = request.json
     data = data['params']
-    # data1 = str(data).split(",")
-    # login = str(data1).split("\"")[3]
-    # password = str(data1).split("\"")[7]
-
-    #powinno sie wycinac dobrze - sprawdzalam
-    #nie polecam tutaj splitowac po przecinkach, bo te punkty są w listach wiec przecinki sa w ich srodku
-    #ten sposob najbezpieczniejszy
-    data2 = str(data).split("\"labels\":")[1] #wywalalo mi bledy ze data jest lista a nie stringiem
-    labels=eval(str(data2).split(",\"image index\"")[0]) #eval zamienia z powrotem na liste tam gdzie potrzeba
-    data3=str(data).split("\"image index\":")[1]
-    image_index=int(str(data3).split(",")[0])
-    data4=str(data).split("\"rec_beg_x\":")[1]
-    rec_beg_x=eval(str(data4).split(",\"")[0])
-    data5 = str(data).split("\"rec_beg_y\":")[1]
-    rec_beg_y = eval(str(data5).split(",\"")[0])
-    data6 = str(data).split("\"rec_w\":")[1]
-    rec_w = eval(str(data6).split(",\"")[0])
-    data7 = str(data).split("\"rec_h\":")[1]
-    rec_h = eval(str(data7).split("}")[0])
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    labels = data["labels"]
+    image_index = data["image index"]
+    rec_beg_x = data["rec_beg_x"]
+    rec_beg_y = data["rec_beg_y"]
+    rec_w = data["rec_w"]
+    rec_h = data["rec_h"]
+    image_id = ''
     cur = mysql.connection.cursor()
     try:
-        #w tej funkcji logowanie nam niepotrzebne
-        #zreszta z logowaniem tez nie dziala
-        # cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
-        # id = cur.fetchall()
-        # id = id[0][0]
-
-        #petla tyle razy ile jest zaznaczen na zdj
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
         for i in range(0, len(labels)):
-            label=labels[i]
-            #sprawdzamy czy taka etykieta jest w bazie
-            cur.execute("SELECT COUNT(*) from kategorie WHERE nazwa = %s", label)
-            exists=cur.fetchall()
-            exists=exists[0][0]
-            #jesli nie ma to najpierw ja dodajemy
-            if int(exists)==int(0):
-                cur.execute("INSERT INTO kategorie (nazwa) VALUES (%s)",label)
-            #wyluskujemy id etykiety
-            cur.execute("SELECT id from kategorie where nazwa=%s",label)
+            cur.execute("SELECT COUNT(*) FROM kategorie WHERE nazwa = %s AND id_uz = %s", (labels[i], id))
+            if_exists=cur.fetchall()
+            if_exists=if_exists[0][0]
+            if int(if_exists) == 0:
+                cur.execute("INSERT INTO kategorie (nazwa, id_uz) VALUES (%s, %s)", (labels[i], id))
+                mysql.connection.commit()
+            cur.execute("SELECT id FROM kategorie WHERE nazwa=%s AND id_uz = %s", (labels[i], id))
             label_id=cur.fetchall()
             label_id=label_id[0][0]
-            #dodajemy adnotacje do bazy
-            cur.execute("INSERT INTO adnotacje (id_kat,id_o,x_start,y_start,szer,wys) VALUES (%s, %s, %s, %s, %s, %s)",
-                        (label_id, image_index,rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i]))
-        #na koniec oznaczamy zdjecie jako adnotowane
-        cur.execute("UPDATE import SET czy_adnotacja = (%s) WHERE id_o = (%s)", (1, image_index))
+            #id obrazu - to wcale nie jest image index
+            cur.execute("SELECT id_o FROM import WHERE id_uz=%s AND czy_adnotacja=%s", (id,0))
+            potential_image_ids = cur.fetchall()
+            image_id = potential_image_ids[image_index+1][0]
+            cur.execute("INSERT INTO adnotacje (id_kat, id_o, x_start, y_start, szer, wys) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (label_id, image_id, rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i]))
+        cur.execute("UPDATE import SET czy_adnotacja = (%s) WHERE id_o = (%s) AND id_uz = (%s)", (1, image_id, id))
         mysql.connection.commit()
         cur.close()
         #zwrocenie czegokolwiek

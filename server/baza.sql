@@ -55,7 +55,7 @@ CREATE TABLE `logowanie` (
 --
 ALTER TABLE `import`
   ADD PRIMARY KEY (`id_o`),
-  ADD KEY `id_uż` (`id_uz`);
+  ADD KEY `id_uz` (`id_uz`);
 
 --
 -- Indeksy dla tabeli `logowanie`
@@ -101,8 +101,12 @@ ALTER TABLE `info`
 
 CREATE TABLE kategorie (
     `id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `nazwa` char(50) NOT NULL
+    `nazwa` char(50) NOT NULL,
+    `id_uz` int(11) NOT NULL
 );
+
+ALTER TABLE `kategorie`
+	ADD CONSTRAINT `katIDuz` FOREIGN KEY (`id_uz`) REFERENCES `logowanie` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 CREATE TABLE adnotacje (
     `id_adn` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
