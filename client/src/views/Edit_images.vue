@@ -54,7 +54,6 @@
 <script>
 import {app} from "@/main";
 import axios from "axios";
-
 export default {
   name: "Edit_images",
   data: function() {
@@ -62,8 +61,10 @@ export default {
       visibleLeft:false,
       visibleRight:false,
       imported:[],
+      imported_ind:[],
       annotated:[],
       current_img: null,
+      current_real_id:0,
       displayed_imported_images:[],
       displayed_annotated_images:[],
       canvas:null,
@@ -133,7 +134,7 @@ export default {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
             "labels": this.labels,
-            "image index": this.indexOfCurrentImage,
+            "image index": this.current_real_id,
             "rec_beg_x": this.rec_beg_x,
             "rec_beg_y": this.rec_beg_y,
             "rec_w": this.rec_w,
@@ -149,13 +150,16 @@ export default {
             "password": app.config.globalProperties.$password.value
           };
           const imported = [];
+          const imported_ind = [];
           await axios.post("http://localhost:5000/get_imported_images", {params: JSON.stringify(dict)}).then(function (response) {
             for (let i = 0; i < response.data["images"].length; i++) {
               imported.push("data:image/jpeg;base64," + response.data["images"][i]);
+              imported_ind.push(response.data["indexes"][i][0]);
             }
             return imported;
           });
           this.imported = imported;
+          this.imported_ind=imported_ind;
           if (this.imported.length < 4)
             this.displayed_imported_images = imported.slice(0, this.imported.length);
           else
@@ -197,6 +201,7 @@ export default {
         },
         async selected(index) {
           this.indexOfCurrentImage = index;
+          this.current_real_id=this.imported_ind[index];
           this.rec_counter = 0;
           this.rec_beg_x = [];
           this.rec_beg_y = [];

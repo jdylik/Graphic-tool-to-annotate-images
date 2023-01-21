@@ -76,10 +76,12 @@ def get_imported_images():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id,0))
+        cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 0))
         images = cur.fetchall()
+        cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 0))
+        ids = cur.fetchall()
         cur.close()
-        return json.dumps({"images": images}, ensure_ascii=False)
+        return json.dumps({"images": images, "indexes": ids}, ensure_ascii=False)
     except Exception:
         cur.close()
         return "Ojojoj"
@@ -96,7 +98,7 @@ def get_annotated_images():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id,1))
+        cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 1))
         images = cur.fetchall()
         cur.close()
         return json.dumps({"images": images}, ensure_ascii=False)
@@ -118,7 +120,6 @@ def save_annotations():
     rec_beg_y = data["rec_beg_y"]
     rec_w = data["rec_w"]
     rec_h = data["rec_h"]
-    image_id = ''
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
@@ -126,24 +127,20 @@ def save_annotations():
         id = id[0][0]
         for i in range(0, len(labels)):
             cur.execute("SELECT COUNT(*) FROM kategorie WHERE nazwa = %s AND id_uz = %s", (labels[i], id))
-            if_exists=cur.fetchall()
-            if_exists=if_exists[0][0]
+            if_exists = cur.fetchall()
+            if_exists = if_exists[0][0]
             if int(if_exists) == 0:
                 cur.execute("INSERT INTO kategorie (nazwa, id_uz) VALUES (%s, %s)", (labels[i], id))
                 mysql.connection.commit()
             cur.execute("SELECT id FROM kategorie WHERE nazwa=%s AND id_uz = %s", (labels[i], id))
-            label_id=cur.fetchall()
-            label_id=label_id[0][0]
-            #id obrazu - to wcale nie jest image index
-            cur.execute("SELECT id_o FROM import WHERE id_uz=%s AND czy_adnotacja=%s", (id,0))
-            potential_image_ids = cur.fetchall()
-            image_id = potential_image_ids[image_index+1][0]
-            cur.execute("INSERT INTO adnotacje (id_kat, id_o, x_start, y_start, szer, wys) VALUES (%s, %s, %s, %s, %s, %s)",
-                        (label_id, image_id, rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i]))
-        cur.execute("UPDATE import SET czy_adnotacja = (%s) WHERE id_o = (%s) AND id_uz = (%s)", (1, image_id, id))
+            label_id = cur.fetchall()
+            label_id = label_id[0][0]
+            cur.execute(
+                "INSERT INTO adnotacje (id_kat, id_o, x_start, y_start, szer, wys) VALUES (%s, %s, %s, %s, %s, %s)",
+                (label_id, image_index, rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i]))
+        cur.execute("UPDATE import SET czy_adnotacja = (%s) WHERE id_o = (%s) AND id_uz = (%s)", (1, image_index, id))
         mysql.connection.commit()
         cur.close()
-        #zwrocenie czegokolwiek
         return json.dumps({"annotation": labels}, ensure_ascii=False)
     except Exception:
         cur.close()
