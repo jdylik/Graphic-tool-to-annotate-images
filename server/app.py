@@ -30,8 +30,9 @@ def get_logins_and_passwords():
 def insert_new_data():
     data = request.json
     data = data['params']
-    new_login = data.split("\"")[1]
-    new_password = data.split("\"")[3]
+    data = eval(data)
+    new_login = data[len(data)-2]
+    new_password = data[len(data)-1]
     cur = mysql.connection.cursor()
     try:
         cur.execute("INSERT INTO logowanie (login, haslo) VALUES (%s, %s)", (new_login, new_password))
@@ -47,10 +48,10 @@ def insert_new_data():
 def insert_new_image():
     data = request.json
     data = data['params']
-    data = data.split(",")
-    image = data[0].split("\"")[3]
-    login = data[1].split("\"")[3]
-    password = data[2].split("\"")[3]
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    image = data["img"]
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
@@ -69,8 +70,9 @@ def insert_new_image():
 def get_imported_images():
     data = request.json
     data = data['params']
-    login = data.split("\"")[3]
-    password = data.split("\"")[7]
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
@@ -91,8 +93,9 @@ def get_imported_images():
 def get_annotated_images():
     data = request.json
     data = data['params']
-    login = data.split("\"")[3]
-    password = data.split("\"")[7]
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
@@ -100,8 +103,10 @@ def get_annotated_images():
         id = id[0][0]
         cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 1))
         images = cur.fetchall()
+        cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 1))
+        ids = cur.fetchall()
         cur.close()
-        return json.dumps({"images": images}, ensure_ascii=False)
+        return json.dumps({"images": images, "indexes": ids}, ensure_ascii=False)
     except Exception:
         cur.close()
         return "Ojojoj"
@@ -142,6 +147,46 @@ def save_annotations():
         mysql.connection.commit()
         cur.close()
         return json.dumps({"annotation": labels}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return "Ojojoj"
+
+
+@app.route('/get_annotations', methods=['POST'])
+def get_annotations():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    image_index = data["image index"]
+    rect_indexes = []
+    rec_beg_x = []
+    rec_beg_y = []
+    rec_w = []
+    rec_h = []
+    labels = []
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT * FROM adnotacje where id_o=%s", (image_index,))
+        anno_info = cur.fetchall()
+        anno_num = len(anno_info)
+        for i in range(0, anno_num):
+            rect_indexes.append(anno_info[i][0])
+            rec_beg_x.append(anno_info[i][3])
+            rec_beg_y.append(anno_info[i][4])
+            rec_w.append(anno_info[i][5])
+            rec_h.append(anno_info[i][6])
+            cur.execute("SELECT nazwa FROM kategorie WHERE id = %s", (anno_info[i][1],))
+            label_name = cur.fetchall()[0][0]
+            labels.append(label_name)
+        mysql.connection.commit()
+        cur.close()
+        return json.dumps({"rect index": rect_indexes, "rec_beg_x": rec_beg_x, "rec_beg_y": rec_beg_y, "rec_w": rec_w,
+                           "rec_h": rec_h, "labels": labels}, ensure_ascii=False)
     except Exception:
         cur.close()
         return "Ojojoj"

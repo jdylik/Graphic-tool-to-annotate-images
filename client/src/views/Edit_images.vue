@@ -31,7 +31,7 @@
       <p>Wybierz zdjęcie do edycji</p>
       <ul>
       <li v-for="(image, index) in displayed_imported_images" id="import_list">
-        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index)"/>
+        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index,1)"/>
       </li>
       </ul>
       <Button label="Załaduj więcej" @click="loadMoreImported()" id="moreL"/>
@@ -41,7 +41,7 @@
       <p>Wybierz zdjęcie do edycji</p>
       <ul>
       <li v-for="(image, index) in displayed_annotated_images" id="annotated_list">
-        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index)"/>
+        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index,2)"/>
       </li>
       </ul>
       <Button label="Załaduj więcej" @click="loadMoreAnnotated()" id="moreR"/>
@@ -171,13 +171,16 @@ export default {
             "password": app.config.globalProperties.$password.value
           };
           const annotated = [];
+          const imported_ind = [];
           await axios.post("http://localhost:5000/get_annotated_images", {params: JSON.stringify(dict)}).then(function (response) {
             for (let i = 0; i < response.data["images"].length; i++) {
               annotated.push("data:image/jpeg;base64," + response.data["images"][i]);
+              imported_ind.push(response.data["indexes"][i][0]);
             }
             return annotated;
           });
           this.annotated = annotated;
+          this.imported_ind=imported_ind;
           if (this.annotated.length < 4)
             this.displayed_annotated_images = annotated.slice(0, this.annotated.length);
           else
@@ -199,7 +202,7 @@ export default {
           else
             this.displayed_annotated_images.push.apply(this.displayed_annotated_images, this.annotated.slice(length, length + 4));
         },
-        async selected(index) {
+        async selected(index,num) {
           this.indexOfCurrentImage = index;
           this.current_real_id=this.imported_ind[index];
           this.rec_counter = 0;
@@ -220,6 +223,36 @@ export default {
           this.context.globalAlpha = 1;
           this.context.clearRect(0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33)
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
+          if (num==2)
+          {
+            const dict = {
+            "login": app.config.globalProperties.$login.value,
+            "password": app.config.globalProperties.$password.value,
+              "image index": this.current_real_id
+            };
+            const rec_beg_x=[];
+            const rec_beg_y=[];
+            const rec_w=[];
+            const rec_h=[];
+            const labels=[];
+            await axios.post("http://localhost:5000/get_annotations", {params: JSON.stringify(dict)}).then(function (response) {
+            for (let i = 0; i < response.data["rect index"].length; i++) {
+              rec_beg_x.push(response.data["rec_beg_x"][i]);
+              rec_beg_y.push(response.data["rec_beg_y"][i]);
+              rec_w.push(response.data["rec_w"][i]);
+              rec_h.push(response.data["rec_h"][i]);
+              labels.push(response.data["labels"][i]);
+            }
+          });
+            this.rec_beg_x=rec_beg_x;
+            this.rec_beg_y=rec_beg_y
+            this.rec_w=rec_w;
+            this.rec_h=rec_h;
+            this.labels=labels;
+            this.rec_counter=this.rec_beg_x.length;
+            this.drawAllRects();
+          }
+
         },
         drawAllRects()
         {
