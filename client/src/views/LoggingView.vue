@@ -1,9 +1,9 @@
 <template>
 <div id="Login">
   <button id="L" onclick="getElementById('logowanie').style.display='block';getElementById('rejestracja').style.display='none';
-  getElementById('L').style.color='#6ce8ac'; getElementById('R').style.color='#FFFF'" >Logowanie</button>
+  getElementById('L').style.color='black'; getElementById('R').style.color='#778da9'" >Logowanie</button>
   <button id="R" onclick="getElementById('rejestracja').style.display='block';getElementById('logowanie').style.display='none';
-  getElementById('R').style.color='#6ce8ac';getElementById('L').style.color='#FFFF'">Rejestracja</button>
+  getElementById('R').style.color='black';getElementById('L').style.color='#778da9'">Rejestracja</button>
   <div id="logowanie">
     <label for="login_input">Login:</label>
     <InputText id="login_input" v-model="user_login" @keyup.enter.native="try_to_log_in()"/><br><br>
@@ -124,6 +124,7 @@ export default {
   margin-left: auto;
   margin-right: auto;
   padding:20px;
+
 }
 
 #logowanie{
@@ -140,21 +141,21 @@ export default {
   text-align: center;
   cursor: pointer;
   outline: none;
-  color: #fff;
-  background-color: steelblue;
+  color: black;
+  background-color: #e0e1dd;
   border-radius: 15px;
   margin-left: 5px;
   margin-right: 5px;
 }
 
-#L:hover {background-color: #2c3e50}
+#L:hover {background-color: #415a77}
 
 #L:active {
   background-color: #2c3e50;
   transform: translateY(4px);
 }
 
-#R:hover {background-color: #2c3e50}
+#R:hover {background-color: #415a77}
 
 #R:active {
   background-color: #2c3e50;
@@ -176,14 +177,14 @@ export default {
   text-align: center;
   cursor: pointer;
   outline: none;
-  color: #fff;
-  background-color: steelblue;
+  color: black;
+  background-color: #e0e1dd;
   border-radius: 15px;
   margin-left: 5px;
   margin-right: 5px;
 }
 
-#submit:hover {background-color: #2c3e50}
+#submit:hover {background-color: #415a77}
 
 #submit:active {
   background-color: #2c3e50;
@@ -192,5 +193,6 @@ export default {
 
 label{
   margin-right: 10px;
+  color: #0d1b2a;
 }
 </style>

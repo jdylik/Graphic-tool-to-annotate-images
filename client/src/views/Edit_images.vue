@@ -28,7 +28,7 @@
     </div>
 
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
-      <p>Wybierz zdjęcie do edycji</p>
+      <p class="sidebar-message">Wybierz zdjęcie do edycji</p>
       <ul>
       <li v-for="(image, index) in displayed_imported_images" id="import_list">
         <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index,1)"/>
@@ -38,7 +38,7 @@
     </Sidebar>
 
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
-      <p>Wybierz zdjęcie do edycji</p>
+      <p class="sidebar-message">Wybierz zdjęcie do edycji</p>
       <ul>
       <li v-for="(image, index) in displayed_annotated_images" id="annotated_list">
         <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index,2)"/>
@@ -436,7 +436,7 @@ export default {
 <style>
 
 canvas{
-  background: white;
+  background: #e0e1dd;
 }
 
 #lista p{
@@ -454,7 +454,7 @@ canvas{
     width: 20px;
     background-color: blue;
     border-radius: 50%;
-    border: 3px solid rgb(214, 214, 214);
+    border: 3px solid #e0e1dd;
     transition: transform .5s;
     color:red;
 }
@@ -466,18 +466,19 @@ canvas{
   text-align: center;
   cursor: pointer;
   outline: none;
-  color: #fff;
-  background-color: steelblue;
+  color: #0d1b2a;
+  background-color: #e0e1dd;
   border-radius: 15px;
   margin-left: 5px;
   margin-right: 5px;
 }
 
-.tools:hover {background-color: #2c3e50}
+.tools:hover {background-color: #415a77}
 
 .tools:active {
   background-color: #2c3e50;
   transform: translateY(4px);
+
 }
 
 ul
@@ -485,6 +486,11 @@ ul
   list-style-tuple:none;
 }
 
+
+#edit{
+  background-color: #778da9;
+}
+#edit:hover {background-color: #415a77}
 #typy{
   list-style: circle;
   width: 20%;
@@ -523,9 +529,9 @@ ul
 .p-sidebar-close{
   width: 100px;
   height: 20px;
-  background-color: black;
-  border: solid 2px white;
-  color: white;
+  background-color: #0d1b2a;
+  border: solid 2px #e0e1dd;
+  color: #e0e1dd;
   padding: 20px;
   text-align: center;
   display: inline-block;
@@ -554,11 +560,11 @@ ul
 }
 
 p{
-  color: white;
+  color: #e0e1dd;
 }
 
 a{
-  color: white;
+  color: #e0e1dd;
 }
 
 #moreL {
@@ -572,14 +578,14 @@ a{
   text-align: center;
   cursor: pointer;
   outline: none;
-  color: #fff;
-  background-color: steelblue;
+  color: #0d1b2a;
+  background-color: #778da9;
   border-radius: 15px;
   margin-left: 5px;
   margin-right: 5px;
 }
 
-#moreL:hover {background-color: #2c3e50}
+#moreL:hover {background-color: #415a77}
 
 #moreL:active {
   background-color: #2c3e50;
@@ -596,14 +602,14 @@ a{
   text-align: center;
   cursor: pointer;
   outline: none;
-  color: #fff;
-  background-color: steelblue;
+  color: #0d1b2a;
+  background-color: #778da9;
   border-radius: 15px;
   margin-left: 5px;
   margin-right: 5px;
 }
 
-#moreR:hover {background-color: #2c3e50}
+#moreR:hover {background-color: #415a77}
 
 #moreR:active {
   background-color: #2c3e50;
@@ -613,5 +619,7 @@ a{
 a{
   padding: 15px;
 }
-
+.sidebar-message{
+  color:#e0e1dd;
+}
 </style>

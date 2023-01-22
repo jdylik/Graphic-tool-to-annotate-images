@@ -58,7 +58,7 @@ export default {
 p{
   padding: 15px;
   font-size: large;
-  color: #42b983;
+  color: #0d1b2a;
   margin-top: 30px;
 }
 input{
