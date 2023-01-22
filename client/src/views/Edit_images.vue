@@ -250,6 +250,7 @@ export default {
             this.rec_h=rec_h;
             this.labels=labels;
             this.rec_counter=this.rec_beg_x.length;
+            this.unique_labels=Array.from(new Set(this.labels));
             this.drawAllRects();
           }
 
