@@ -1,6 +1,7 @@
 
 <template>
   <div id="pageWrap">
+    <p>{{work_option}}</p>
     <div id="kanwas">
       <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
       <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
@@ -19,6 +20,7 @@
       <Button label="Rysuj" @click="drawRectangle();" id="draw" class="tools"/>
       <Button label="Usuń" @click="deleteRectangle();" class="tools"/>
       <Button label="Zapisz" @click="saveAnnotations()" class="tools"/>
+      <Button label="Eksportuj" @click="exportData()" class="tools"/>
     </div>
 
     <div id="row2">
@@ -93,6 +95,7 @@ export default {
       strokeColor:[],
       fillColor:[],
       if_deleted:false,
+      work_option:"Tryb: ",
     }
   },
   methods:
@@ -167,6 +170,7 @@ export default {
                   }
                 }
                 this.drawAllRects();
+                this.work_option="Tryb: ";
               } else
                 document.getElementById("object_type").value = '';
             } else
@@ -248,6 +252,7 @@ export default {
             this.displayed_annotated_images.push.apply(this.displayed_annotated_images, this.annotated.slice(length, length + 4));
         },
         async selected(index,num) {
+          this.work_option="Tryb: ";
           this.indexOfCurrentImage = index;
           this.current_real_id=this.imported_ind[index];
           this.rec_counter = 0;
@@ -304,7 +309,7 @@ export default {
             this.rec_h=rec_h;
             this.labels=labels;
             this.rec_counter=this.rec_beg_x.length;
-	    this.unique_labels=Array.from(new Set(this.labels));
+	          this.unique_labels=Array.from(new Set(this.labels));
             this.drawAllRects();
           }
 
@@ -353,6 +358,7 @@ export default {
             }
         },
         drawRectangle() {
+            this.work_option="Tryb: rysowanie";
             if (this.current_img != null) {
               this.ifButtonDrawClicked = true;
               this.ifButtonRemoveClicked = false;
@@ -416,10 +422,10 @@ export default {
                         this.rec_counter += 1;
                       }
                     }
-                    else {
-                      this.stroke_colors.pop();
-                      this.fill_colors.pop();
-                    }
+                    // else {
+                    //   this.stroke_colors.pop();
+                    //   this.fill_colors.pop();
+                    // }
                     //while (this.stroke_colors.length !== this.rec_counter)
                     //{
                     //  this.stroke_colors.pop();
@@ -468,11 +474,13 @@ export default {
                   previous_x = current_x;
                   previous_y = current_y;
                 }
+
               });
             }
         },
         deleteRectangle()
         {
+          this.work_option="Tryb: usuwanie";
           this.if_deleted = true;
           this.ifButtonRemoveClicked = true;
           this.ifButtonDrawClicked = false;
@@ -510,6 +518,7 @@ export default {
                   }
                 }
                 this.drawAllRects();
+                this.work_option="Tryb: ";
                 this.context.stroke();
                 this.context.closePath();
                 this.ifButtonRemoveClicked = false;
@@ -710,6 +719,7 @@ a{
   background-color: #2c3e50;
   transform: translateY(4px);
 }
+
 #moreR {
   height: 7%;
   width: 10%;
