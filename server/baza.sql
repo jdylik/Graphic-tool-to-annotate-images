@@ -102,6 +102,8 @@ ALTER TABLE `info`
 CREATE TABLE kategorie (
     `id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `nazwa` char(50) NOT NULL,
+    `szkic_kolor` char(20),
+    `wyp_kolor` char(20),
     `id_uz` int(11) NOT NULL
 );
 
