@@ -9,8 +9,7 @@
         <input type="text" id="object_type" v-on:keyup.enter="onEnter"/>
         <ul id="typy">
           <li v-for="(value, index) in unique_labels"  id="kolko">
-          <!--<span class="clr" style="color:red"></span>-->
-            <span>{{ value }}</span>
+            <span>{{ value }} - {{nr_labels[index]}}</span>
           </li>
         </ul>
       </div>
@@ -73,7 +72,6 @@ export default {
       rec_beg_y:[],
       rec_w:[],
       rec_h:[],
-      colors:['rgb(255,0,0)', 'rgb(0,128,0)'],
       current_label:'',
       labels:[],
       labels_counter:[],
@@ -87,43 +85,90 @@ export default {
       edition_count:0,
       unique_labels:[],
       nr_labels:[],
+      unique_colors:[],
+      fill_colors:[],
+      stroke_colors:[],
+      fill_colors_for_labels:[],
+      stroke_colors_for_labels:[],
+      strokeColor:[],
+      fillColor:[],
+      if_deleted:false,
     }
   },
   methods:
       {
         onEnter:function() {
+          this.ifButtonDrawClicked = false;
           if (document.getElementById("object_type").value !== '') {
-            if (this.is_rect_finished) {
-              this.current_label = document.getElementById("object_type").value;
-              document.getElementById("object_type").value = '';
-              if (this.edition_count !== 0)
-                this.labels.splice(this.labels.length - 1, 1);
-              this.labels.push(this.current_label);
-              this.drawAllRects();
-              if (Object.keys(this.labels_counter).length === 0) {
-                this.labels_counter[this.current_label] = 1;
-              } else {
-                if (this.current_label in this.labels_counter)
-                  this.labels_counter[this.current_label] += 1;
-                else
+            if (this.rec_beg_x.length !== 0 && !this.if_deleted) {
+              if (this.is_rect_finished) {
+                if (document.getElementById("object_type").value.length / this.rec_w[this.rec_counter - 1] > 0.15) {
+                  alert("Podpis zdjęcia jest za długi! Zaleca się zmianę podpisu w celu braku utraty danych.")
+                  this.current_label = '...';
+                } else
+                  this.current_label = document.getElementById("object_type").value;
+                document.getElementById("object_type").value = '';
+                if (this.edition_count !== 0) {
+                  this.labels.splice(this.labels.length - 1, 1);
+                }
+                this.labels.push(this.current_label);
+                if (Object.keys(this.fill_colors_for_labels).includes(this.current_label)) {
+                  this.stroke_colors.splice(this.stroke_colors.length - 1, 1);
+                  this.fill_colors.splice(this.fill_colors.length - 1, 1);
+                  this.stroke_colors.push(this.stroke_colors_for_labels[this.current_label]);
+                  this.fill_colors.push(this.fill_colors_for_labels[this.current_label]);
+                } else if (this.edition_count !== 0 && Object.keys(this.fill_colors_for_labels).includes(this.previous_label)) {
+                  this.strokeColor = this.getRandomRGB();
+                  this.fillColor = this.strokeColor.map(function (x) {
+                    return x * 1.5;
+                  });
+                  this.stroke_colors.splice(this.stroke_colors.length - 1, 1);
+                  this.fill_colors.splice(this.fill_colors.length - 1, 1);
+                  this.stroke_colors.push(this.strokeColor);
+                  this.fill_colors.push(this.fillColor);
+                }
+                if (Object.keys(this.labels_counter).length === 0) {
                   this.labels_counter[this.current_label] = 1;
-                if (this.previous_label !== '' && this.previous_label !== this.current_label && this.edition_count !== 0) {
-                  if (this.labels_counter[this.previous_label] === 1)
-                    delete this.labels_counter[this.previous_label];
-                  else
-                    this.labels_counter[this.previous_label] -= 1;
+                  this.fill_colors_for_labels[this.current_label] = this.fillColor;
+                  this.stroke_colors_for_labels[this.current_label] = this.strokeColor;
+                } else {
+                  if (this.current_label in this.labels_counter) {
+                    this.labels_counter[this.current_label] += 1;
+                  } else {
+                    this.labels_counter[this.current_label] = 1;
+                    this.fill_colors_for_labels[this.current_label] = this.fillColor;
+                    this.stroke_colors_for_labels[this.current_label] = this.strokeColor;
+                  }
+                  if (this.previous_label !== '' && this.previous_label !== this.current_label && this.edition_count !== 0) {
+                    if (this.labels_counter[this.previous_label] === 1) {
+                      delete this.labels_counter[this.previous_label];
+                      delete this.fill_colors_for_labels[this.previous_label];
+                      delete this.stroke_colors_for_labels[this.previous_label];
+                    } else {
+                      this.labels_counter[this.previous_label] -= 1;
+                    }
+                  }
                 }
-              }
-              this.previous_label = this.current_label;
-              this.edition_count += 1;
-              this.unique_labels = [];
-              this.nr_labels = [];
-              for (let key in this.labels_counter) {
-                if (this.labels_counter.hasOwnProperty(key)) {
-                  this.unique_labels.push(key);
-                  this.nr_labels.push(this.current_label[key]);
+                if (this.labels_counter[this.previous_label] > 1 && this.edition_count !== 0)
+                  this.labels_counter[this.previous_label] -= 1;
+                else if (this.labels_counter[this.previous_label] < 1 && this.edition_count !== 0) {
+                  delete this.labels_counter[this.previous_label];
+                  delete this.fill_colors_for_labels[this.previous_label];
+                  delete this.stroke_colors_for_labels[this.previous_label];
                 }
-              }
+                this.previous_label = this.current_label;
+                this.edition_count += 1;
+                this.unique_labels = [];
+                this.nr_labels = [];
+                for (let key in this.labels_counter) {
+                  if (this.labels_counter.hasOwnProperty(key)) {
+                    this.unique_labels.push(key);
+                    this.nr_labels.push(this.labels_counter[key]);
+                  }
+                }
+                this.drawAllRects();
+              } else
+                document.getElementById("object_type").value = '';
             } else
               document.getElementById("object_type").value = '';
           }
@@ -210,6 +255,13 @@ export default {
           this.rec_beg_y = [];
           this.rec_w = [];
           this.rec_h = [];
+          this.stroke_colors = [];
+          this.fill_colors = [];
+          this.fillColor = [];
+          this.strokeColor = [];
+          this.unique_colors = [];
+          this.fill_colors_for_labels = [];
+          this.stroke_colors_for_labels = [];
           this.labels = [];
           this.current_label = '';
           this.labels_counter = [];
@@ -223,7 +275,7 @@ export default {
           this.context.globalAlpha = 1;
           this.context.clearRect(0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33)
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
-          if (num==2)
+          if (num===2)
           {
             const dict = {
             "login": app.config.globalProperties.$login.value,
@@ -235,6 +287,8 @@ export default {
             const rec_w=[];
             const rec_h=[];
             const labels=[];
+            this.stroke_colors = [];
+            this.fill_colors = [];
             await axios.post("http://localhost:5000/get_annotations", {params: JSON.stringify(dict)}).then(function (response) {
             for (let i = 0; i < response.data["rect index"].length; i++) {
               rec_beg_x.push(response.data["rec_beg_x"][i]);
@@ -250,7 +304,7 @@ export default {
             this.rec_h=rec_h;
             this.labels=labels;
             this.rec_counter=this.rec_beg_x.length;
-            this.unique_labels=Array.from(new Set(this.labels));
+	    this.unique_labels=Array.from(new Set(this.labels));
             this.drawAllRects();
           }
 
@@ -258,11 +312,11 @@ export default {
         drawAllRects()
         {
           this.context.beginPath();
-          this.context.strokeStyle = "rgb(0, 0, 255)";
-          this.context.fillStyle = "rgba(255,0,0, 0.2)";
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
           for(let i = 0; i < this.rec_counter; i++)
           {
+            this.context.strokeStyle = `rgb(${this.stroke_colors[i][0]}, ${this.stroke_colors[i][1]}, ${this.stroke_colors[i][2]})`;
+            this.context.fillStyle = `rgb(${this.fill_colors[i][0]}, ${this.fill_colors[i][1]}, ${this.fill_colors[i][2]}, 0.2)`;
             this.context.fillRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
             this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], this.rec_h[i]);
             if (this.rec_w[i] > 0 && this.rec_h[i] > 0)
@@ -273,7 +327,8 @@ export default {
               this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i], this.rec_w[i], -20);
             else if (this.rec_w[i] < 0 && this.rec_h[i] < 0)
               this.context.strokeRect(this.rec_beg_x[i], this.rec_beg_y[i] + this.rec_h[i], this.rec_w[i], -20);
-            this.context.font = "15px Georgia";
+            this.context.fillStyle = "rgb(0, 0, 0)";
+            this.context.font = "bold 15px Serif";
             if (this.labels[i] === undefined) {
               if (this.rec_w[i] > 0 && this.rec_h[i] > 0)
                 this.context.fillText('', this.rec_beg_x[i] + 5, this.rec_beg_y[i] - 5);
@@ -294,6 +349,7 @@ export default {
               else if (this.rec_w[i] < 0 && this.rec_h[i] < 0)
                   this.context.fillText(this.labels[i], this.rec_beg_x[i] + this.rec_w[i] + 5, this.rec_beg_y[i] + this.rec_h[i] - 5);
             }
+            this.context.fillStyle = `rgb(${this.fill_colors[i][0]}, ${this.fill_colors[i][1]}, ${this.fill_colors[i][2]}, 0.2)`;
             }
         },
         drawRectangle() {
@@ -310,27 +366,46 @@ export default {
               let draw = false;
               this.is_rect_finished = false;
               window.addEventListener("mousedown", (e) => {
-                if (this.rec_beg_x.length !== this.labels.length && e.target.localName === 'canvas') {
-                  this.rec_beg_x.pop();
-                  this.rec_beg_y.pop();
-                  this.rec_w.pop();
-                  this.rec_h.pop();
-                  this.rec_counter -= 1;
-                  this.drawAllRects();
-                  this.context.stroke();
-                  this.context.closePath();
-                }
-                if (e.target.localName === 'canvas' && this.ifButtonDrawClicked === true && this.labels[this.rec_counter - 1] !== '') {
-                  this.edition_count = 0;
-                  this.new_rect = true;
-                  this.is_rect_finished = false;
-                  draw = true;
+                if (e.target.localName === 'canvas' && this.ifButtonDrawClicked)
+                  this.if_deleted = false;
+                if (e.target.localName === 'canvas') {
+                  if(this.ifButtonDrawClicked === true)
+                  if (this.ifButtonRemoveClicked !== true && this.ifButtonDrawClicked === true) {
+                    if (this.rec_beg_x.length !== this.labels.length) {
+                      this.rec_beg_x.pop();
+                      this.rec_beg_y.pop();
+                      this.rec_w.pop();
+                      this.rec_h.pop();
+                      this.stroke_colors.pop();
+                      this.fill_colors.pop();
+                      this.rec_counter -= 1;
+                      if (this.rec_counter < 0)
+                        this.rec_counter = 0;
+                      this.drawAllRects();
+                      this.context.stroke();
+                      this.context.closePath();
+                    }
+                    if (this.rec_counter === this.stroke_colors.length) {
+                      this.strokeColor = this.getRandomRGB();
+                      this.fillColor = this.strokeColor.map(function (x) {
+                        return x * 1.5;
+                      });
+                      this.stroke_colors.push(this.strokeColor);
+                      this.fill_colors.push(this.fillColor);
+                    }
+                    if (this.ifButtonDrawClicked === true && this.labels[this.rec_counter - 1] !== '') {
+                      this.edition_count = 0;
+                      this.new_rect = true;
+                      this.is_rect_finished = false;
+                      draw = true;
+                    }
+                  }
                 }
               });
               window.addEventListener("mouseup", (e) => {
                 if (e.target.localName === 'canvas') {
                   this.new_rect = false;
-                  if (this.ifButtonDrawClicked === true) {
+                  if (this.ifButtonDrawClicked === true && this.ifButtonRemoveClicked === false) {
                     if ((((previous_x - beginning_x) * (previous_y - beginning_y) > 1000) || ((previous_x - beginning_x) * (previous_y - beginning_y) < -1000))) {
                       this.is_rect_finished = true;
                       if (this.rec_beg_x.indexOf(beginning_x) === -1 && this.rec_beg_y.indexOf(beginning_y) === -1) {
@@ -341,6 +416,15 @@ export default {
                         this.rec_counter += 1;
                       }
                     }
+                    else {
+                      this.stroke_colors.pop();
+                      this.fill_colors.pop();
+                    }
+                    //while (this.stroke_colors.length !== this.rec_counter)
+                    //{
+                    //  this.stroke_colors.pop();
+                    //  this.fill_colors.pop();
+                    //}
                     this.drawAllRects();
                     this.context.stroke();
                     this.context.closePath();
@@ -349,11 +433,11 @@ export default {
                     //this.displayed_imported_images[this.indexOfCurrentImage] = document.getElementById('myCanvas').toDataURL('image/jpeg');
                     draw = false;
                   } else
-                    draw = false;
+                      draw = false;
                 }
               });
               window.addEventListener("mousemove", (e) => {
-                if (this.ifButtonRemoveClicked !== true) {
+                if (this.ifButtonRemoveClicked !== true && this.ifButtonDrawClicked === true) {
                   if ((e.target.localName !== 'canvas' || e.offsetY - 20 < 0) && !this.is_rect_finished) {
                     draw = false;
                     this.drawAllRects();
@@ -373,6 +457,8 @@ export default {
                   //this.context.globalAlpha = 0.4;
                   //this.context.clearRect(beginning_x, beginning_y, previous_x - beginning_x, previous_y - beginning_y);
                   this.drawAllRects();
+                  this.context.strokeStyle = `rgb(${this.strokeColor[0]}, ${this.strokeColor[1]}, ${this.strokeColor[2]})`;
+                  this.context.fillStyle = `rgb(${this.fillColor[0]}, ${this.fillColor[1]}, ${this.fillColor[2]}, 0.2)`;
                   this.context.strokeRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
                   this.context.fillRect(beginning_x, beginning_y, current_x - beginning_x, current_y - beginning_y);
                   //this.context.beginPath();
@@ -387,10 +473,11 @@ export default {
         },
         deleteRectangle()
         {
+          this.if_deleted = true;
           this.ifButtonRemoveClicked = true;
           this.ifButtonDrawClicked = false;
           window.addEventListener("click", (e) => {
-              if (e.target.localName === 'canvas' && this.ifButtonRemoveClicked === true) {
+              if (e.target.localName === 'canvas' && this.ifButtonRemoveClicked === true && this.labels.length === this.rec_beg_x.length) {
                 for (let i = this.rec_counter - 1; i > -1; i--)
                 {
                   if (((e.offsetX >= this.rec_beg_x[i] && e.offsetX <= this.rec_beg_x[i] + this.rec_w[i])||(e.offsetX <= this.rec_beg_x[i] && e.offsetX >= this.rec_beg_x[i] + this.rec_w[i])) && ((e.offsetY >= this.rec_beg_y[i] && e.offsetY <= this.rec_beg_y[i] + this.rec_h[i])||(e.offsetY <= this.rec_beg_y[i] && e.offsetY >= this.rec_beg_y[i] + this.rec_h[i])))
@@ -405,14 +492,18 @@ export default {
                     }
                     else {
                       delete this.labels_counter[this.labels[i]];
+                      delete this.fill_colors_for_labels[this.labels[i]];
+                      delete this.stroke_colors_for_labels[this.labels[i]];
                     }
-                    this.labels.splice(this.labels.indexOf(this.labels[i]), 1);
+                    this.labels.splice(i, 1);
+                    this.fill_colors.splice(this.labels.indexOf(this.labels[i]), 1);
+                    this.stroke_colors.splice(this.labels.indexOf(this.labels[i]), 1);
                     this.unique_labels = [];
                     this.nr_labels = [];
                     for (let key in this.labels_counter) {
                       if (this.labels_counter.hasOwnProperty(key)) {
                         this.unique_labels.push(key);
-                        this.nr_labels.push(this.current_label[key]);
+                        this.nr_labels.push(this.labels_counter[key]);
                       }
                     }
                     this.rec_counter -= 1;
@@ -421,9 +512,37 @@ export default {
                 this.drawAllRects();
                 this.context.stroke();
                 this.context.closePath();
+                this.ifButtonRemoveClicked = false;
               }
             });
-        }
+        },
+        getRandomRGB()
+        {
+          let r = Math.floor(Math.random() * 255);
+          let g = Math.floor(Math.random() * 255);
+          let b = Math.floor(Math.random() * 255);
+          let rs = []
+          let gs = []
+          let bs = []
+          for(let i = 0; i < this.fill_colors.length; i++)
+          {
+            rs.push(this.fill_colors[i][0])
+            gs.push(this.fill_colors[i][1])
+            bs.push(this.fill_colors[i][2])
+          }
+          while(true)
+          {
+            if ((r === 0 && g === 0 && b === 0) || ((r === 255 && g === 255 && b === 255)|| rs.includes(r) || gs.includes(g) || bs.includes(b)))
+            {
+              r = Math.floor(Math.random() * 255);
+              g = Math.floor(Math.random() * 255);
+              b = Math.floor(Math.random() * 255);
+            }
+            else
+              break;
+          }
+          return [r, g, b]
+        },
       },
       mounted()
       {
