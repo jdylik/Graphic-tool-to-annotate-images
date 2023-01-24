@@ -31,8 +31,8 @@
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
       <p class="sidebar-message">Wybierz zdjęcie do edycji</p>
       <ul>
-      <li v-for="(image, index) in displayed_imported_images" id="import_list">
-        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index,1)"/>
+      <li v-for="(image, index_l) in displayed_imported_images" id="import_list">
+        <img v-bind:id="index_l" :src="image" v-if="image" width="200" height="150" @click="selected(index_l,1)"/>
       </li>
       </ul>
       <Button label="Załaduj więcej" @click="loadMoreImported()" id="moreL"/>
@@ -41,8 +41,8 @@
     <Sidebar v-model:visible="visibleRight" position="right" class="sidebar_right" id="sidebar_right">
       <p class="sidebar-message">Wybierz zdjęcie do edycji</p>
       <ul>
-      <li v-for="(image, index) in displayed_annotated_images" id="annotated_list">
-        <img v-bind:id="index" :src="image" v-if="image" width="200" height="150" @click="selected(index,2)"/>
+      <li v-for="(image, index_r) in displayed_annotated_images" id="annotated_list">
+        <img v-bind:id="index_r" :src="image" v-if="image" width="200" height="150" @click="selected(index_r,1)"/>
       </li>
       </ul>
       <Button label="Załaduj więcej" @click="loadMoreAnnotated()" id="moreR"/>
@@ -187,10 +187,11 @@ export default {
             "rec_beg_x": this.rec_beg_x,
             "rec_beg_y": this.rec_beg_y,
             "rec_w": this.rec_w,
-            "rec_h": this.rec_h
+            "rec_h": this.rec_h,
+            "fill_colors":this.fill_colors,
+            "stroke_colors":this.stroke_colors,
           };
           await axios.post("http://localhost:5000/save_annotations", {params: JSON.stringify(dict)})
-          return "Ojojoj";
         },
 
         async loadImportedImages() {
@@ -217,19 +218,44 @@ export default {
         async loadAnnotatedImages() {
           const dict = {
             "login": app.config.globalProperties.$login.value,
-            "password": app.config.globalProperties.$password.value
+            "password": app.config.globalProperties.$password.value,
+
           };
           const annotated = [];
-          const imported_ind = [];
+          const annotated_ind = [];                                                                                                                                                                                                                                                                                                                                                                                                                                                                             0
           await axios.post("http://localhost:5000/get_annotated_images", {params: JSON.stringify(dict)}).then(function (response) {
-            for (let i = 0; i < response.data["images"].length; i++) {
-              annotated.push("data:image/jpeg;base64," + response.data["images"][i]);
-              imported_ind.push(response.data["indexes"][i][0]);
+            let data = response.data["images"];
+            for(let i = 0; i < data.length; i++)
+            {
+              let canvas = document.createElement('canvas');
+              canvas.width = 200;
+              canvas.height = 150;
+              let ctx = canvas.getContext('2d');
+              //ctx.globalAlpha = 1;
+              let image = new Image();
+              ctx.fillStyle = '#fff';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              image.onload = function() {
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+              };
+              image.src = "data:image/jpeg;base64," + data[i][1];
+              let start_x = data[i][2];
+              let start_y = data[i][3];
+              let width = data[i][4];
+              let height = data[i][5];
+              let label = data[i][6];
+              ctx.fillStyle = `rgb(${data[i][8].toString().split(",")[0].split("[")[1]}, ${data[i][8].toString().split(",")[1]}, ${data[i][8].toString().split(",")[2].split("]")[0]})`;
+              ctx.fillRect(start_x / 3.33, start_y / 3.33, width / 3.33, height / 3.33);
+              //ctx.strokeRect(start_x, start_y, width, height);
+              //let stroke_color = "rgb(" + data[i][7].toString().split(",")[0].split("[")[7] + ", " + data[i][7].toString().split(",")[1] + ", " + data[i][7].toString().split(",")[2].split("]")[0] + ")";
+              let url = canvas.toDataURL('image/jpeg');
+              //ctx.strokeRect(start_x, start_y, width, height);
+              annotated.push(url);
             }
             return annotated;
           });
           this.annotated = annotated;
-          this.imported_ind=imported_ind;
+          this.annotated_ind=annotated_ind;
           if (this.annotated.length < 4)
             this.displayed_annotated_images = annotated.slice(0, this.annotated.length);
           else
@@ -553,10 +579,30 @@ export default {
           return [r, g, b]
         },
       },
-      mounted()
+      async mounted()
       {
         this.canvas = document.getElementById("myCanvas");
         this.context = this.canvas.getContext("2d");
+        const req_dict = {
+            "login": app.config.globalProperties.$login.value,
+            "password": app.config.globalProperties.$password.value,
+            };
+          let com_fill = [];
+          let com_str = [];
+          await axios.post("http://localhost:5000/get_categories", {params: JSON.stringify(req_dict)}).then(function (response) {
+              if ("empty" in response.data)
+              {}
+              else
+              {
+                for (let i = 0; i < response.data["names"].length; i++) {
+                  com_fill[response.data["names"][i]] = response.data["fill_colors"][i];
+                  com_str[response.data["names"][i]] = response.data["stroke_colors"][i];
+                }
+
+              }
+          });
+          this.common_fill_colors_for_labels = com_fill;
+          this.common_stroke_colors_for_labels = com_str;
       }
 }
 </script>

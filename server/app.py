@@ -101,12 +101,32 @@ def get_annotated_images():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 1))
-        images = cur.fetchall()
         cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 1))
         ids = cur.fetchall()
+        ids_list = []
+        images = []
+        adns = []
+        for id_o in ids:
+            ids_list.append(id_o[0])
+        for id_o in ids_list:
+            cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND czy_adnotacja=%s", (id, 1))
+            image = cur.fetchall()
+            cur.execute("SELECT id_kat, x_start, y_start, szer, wys FROM adnotacje WHERE id_o = %s", (id_o, ))
+            adn_data = cur.fetchall()
+            for rect in adn_data:
+                adns.append(id_o)
+                adns.append(image)
+                category = rect[0]
+                cur.execute("SELECT nazwa, szkic_kolor, wyp_kolor FROM kategorie WHERE id = %s AND id_uz = %s", (category, id))
+                cat_data = cur.fetchall()
+                cat_data = cat_data[0]
+                rect = list(rect[1:])
+                rect.extend(cat_data)
+                adns.extend(rect)
+                images.append(adns)
+                adns = []
         cur.close()
-        return json.dumps({"images": images, "indexes": ids}, ensure_ascii=False)
+        return json.dumps({"images": images}, ensure_ascii=False)
     except Exception:
         cur.close()
         return "Ojojoj"
@@ -125,6 +145,8 @@ def save_annotations():
     rec_beg_y = data["rec_beg_y"]
     rec_w = data["rec_w"]
     rec_h = data["rec_h"]
+    fill_colors = data["fill_colors"]
+    stroke_colors = data["stroke_colors"]
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
@@ -135,7 +157,7 @@ def save_annotations():
             if_exists = cur.fetchall()
             if_exists = if_exists[0][0]
             if int(if_exists) == 0:
-                cur.execute("INSERT INTO kategorie (nazwa, id_uz) VALUES (%s, %s)", (labels[i], id))
+                cur.execute("INSERT INTO kategorie (nazwa, szkic_kolor, wyp_kolor, id_uz) VALUES (%s, %s, %s, %s)", (labels[i], str(stroke_colors[i]), str(fill_colors[i]), id))
                 mysql.connection.commit()
             cur.execute("SELECT id FROM kategorie WHERE nazwa=%s AND id_uz = %s", (labels[i], id))
             label_id = cur.fetchall()
@@ -191,6 +213,36 @@ def get_annotations():
         cur.close()
         return "Ojojoj"
 
+@app.route('/get_categories', methods=['POST'])
+def get_categories():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT COUNT(*) FROM kategorie WHERE id_uz = %s", (id, ))
+        if_exist = cur.fetchall()
+        if_exist = if_exist[0][0]
+        if int(if_exist) == 0:
+            cur.close()
+            return json.dumps({"empty": 1})
+        else:
+            cur.execute("SELECT nazwa FROM kategorie WHERE id_uz = %s", (id,))
+            categories = cur.fetchall()
+            cur.execute("SELECT szkic_kolor FROM kategorie WHERE id_uz = %s", (id,))
+            stroke_cols = cur.fetchall()
+            cur.execute("SELECT wyp_kolor FROM kategorie WHERE id_uz=%s", (id,))
+            fill_cols = cur.fetchall()
+            cur.close()
+            return json.dumps({"names": categories, "stroke_colors": stroke_cols, "fill_colors": fill_cols}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return "Ojojoj"
 
 if __name__ == '__main__':
     app.run()
