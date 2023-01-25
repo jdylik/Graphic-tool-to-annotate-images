@@ -55,6 +55,7 @@
 <script>
 import {app} from "@/main";
 import axios from "axios";
+import router from "@/router";
 export default {
   name: "Edit_images",
   data: function() {
@@ -181,6 +182,10 @@ export default {
             } else
               document.getElementById("object_type").value = '';
           }
+        },
+
+        async exportData() {
+          await router.push({path: '/export'});
         },
 
         async saveAnnotations() {

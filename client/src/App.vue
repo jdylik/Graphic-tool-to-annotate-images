@@ -16,14 +16,12 @@
       <button class="button">
         <router-link style="text-decoration: none; color: inherit;" to="/logout">Wyloguj się</router-link>
       </button>
-
     </nav>
     <router-view/>
     </div>
   <footer>
       <div id="footer">&copy Katarzyna Prokop, Jan Dylik, Adrian Matlok, Michał Pluszczewski</div>
   </footer>
-
 </template>
 
 <style>

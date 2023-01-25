@@ -3,6 +3,7 @@ import Import_images from '../views/Import_images.vue'
 import Login from '../views/LoggingView.vue'
 import Logout from '../views/Logout.vue'
 import {app} from '../main.js';
+import Export from "@/views/Export";
 
 const routes = [
   {
@@ -65,6 +66,21 @@ const routes = [
       if (from.name === 'Login')
       {
        router.push('/login');
+      }
+      else
+      {
+        next();
+      }
+    }
+  },
+     {
+    path:'/export',
+    name:'Export',
+    component: Export,
+    beforeEnter:(to,from,next)=>{
+      if (from.name === 'Export')
+      {
+       router.push('/export');
       }
       else
       {

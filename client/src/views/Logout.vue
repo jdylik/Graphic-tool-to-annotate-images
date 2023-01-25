@@ -12,7 +12,7 @@ export default {
   {
     alert("Nastąpiło wylogowanie.");
     app.config.globalProperties.$is_allowed_to_log_in.value = false;
-    router.push({path:'/login'});
+    await router.push({path: '/login'});
   },
 }
 </script>

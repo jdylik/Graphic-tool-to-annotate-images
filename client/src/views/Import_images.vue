@@ -1,3 +1,4 @@
+
 <template>
 <div id="import">
     <p>{{"Załaduj folder ze zdjęciami"}}</p>
@@ -51,7 +52,6 @@ export default {
           }
         },
       },
-
 }
 </script>
 <style>
