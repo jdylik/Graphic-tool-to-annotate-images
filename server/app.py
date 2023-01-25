@@ -192,12 +192,9 @@ def save_annotations():
         cur.execute("SELECT COUNT(*) FROM adnotacje WHERE id_o = %s", (image_id,))
         nr = cur.fetchall()
         nr = int(nr[0][0])
-        print("student", len(labels), nr)
         if len(labels) == 0 and nr != 0:
-            print("a", len(labels))
             cur.execute("DELETE FROM adnotacje WHERE id_o = %s", (image_id,))
         elif len(labels) < nr:
-            print("bdb")
             for i in range(0, len(labels)):
                 cur.execute("SELECT COUNT(*) FROM kategorie WHERE nazwa = %s AND id_uz = %s", (unique_labels[i], id))
                 if_exists = cur.fetchall()
@@ -206,7 +203,6 @@ def save_annotations():
                     cur.execute("INSERT INTO kategorie (nazwa, szkic_kolor, wyp_kolor, id_uz) VALUES (%s, %s, %s, %s)",
                                 (unique_labels[i], str(unique_stroke_c[i]), str(unique_fill_c[i]), id))
                     mysql.connection.commit()
-            print("b", len(labels))
             cur.execute("SELECT x_start, y_start, szer, wys FROM adnotacje WHERE id_o = %s", (image_id,))
             ann_data = cur.fetchall()
             for i in range(0, len(ann_data)):
@@ -231,18 +227,15 @@ def save_annotations():
                             (labels[index], image_id, rec_beg_x[index], rec_beg_y[index], rec_w[index], rec_h[index]))
                         mysql.connection.commit()
         else:
-            print("cooooo")
             # print("c", len(labels), labels, unique_labels, str(unique_stroke_c[1]))
             for i in range(0, len(labels)):
                 cur.execute("SELECT COUNT(*) FROM kategorie WHERE nazwa = %s AND id_uz = %s", (labels[i], id))
                 if_exists = cur.fetchall()
                 if_exists = if_exists[0][0]
-                print("istnieje", if_exists)
                 if int(if_exists) == 0:
                     # print(unique_stroke_c[i])
                     cur.execute("INSERT INTO kategorie (nazwa, szkic_kolor, wyp_kolor, id_uz) VALUES (%s, %s, %s, %s)",
                                 (unique_labels[i], str(unique_stroke_c[i]), str(unique_fill_c[i]), id))
-                    print("studentciiiii")
                     mysql.connection.commit()
                 cur.execute("SELECT id FROM kategorie WHERE nazwa=%s AND id_uz = %s", (labels[i], id))
                 label_id = cur.fetchall()

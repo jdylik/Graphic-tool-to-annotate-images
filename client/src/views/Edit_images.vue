@@ -121,38 +121,15 @@ export default {
                 }
                 this.labels.push(this.current_label);
                 if (Object.keys(this.common_fill_colors_for_labels).includes(this.current_label)) {
-                  console.log(this.common_stroke_colors_for_labels);
                   this.stroke_colors.splice(this.stroke_colors.length - 1, 1);
                   this.fill_colors.splice(this.fill_colors.length - 1, 1);
-                  let strokes = JSON.stringify(this.common_stroke_colors_for_labels[this.current_label]).split(", ");
-                  let stroke = [];
-                  stroke.push(parseFloat(strokes[0].split("\"[")[1]));
-                  stroke.push(parseFloat(strokes[1]));
-                  stroke.push(parseFloat(strokes[2].split("]")[0]));
-                  console.log(stroke);
-                  this.stroke_colors.push(stroke);
-                  let fills = JSON.stringify(this.common_fill_colors_for_labels[this.current_label]).split(", ");
-                  let fill = [];
-                  fill.push(parseFloat(fills[0].split("\"[")[1]));
-                  fill.push(parseFloat(fills[1]));
-                  fill.push(parseFloat(fills[2].split("]")[0]));
-                  this.fill_colors.push(fill);
-                } else if (this.edition_count !== 0 && Object.keys(this.common_fill_colors_for_labels).includes(this.previous_label)) {
-                  this.strokeColor = this.getRandomRGB();
-                  this.fillColor = this.strokeColor.map(function (x) {
-                    return x * 1.5;
-                  });
-                  this.stroke_colors.pop();
-                  this.fill_colors.pop();
-                  //this.stroke_colors.splice(this.stroke_colors.length - 1, 1);
-                  //this.fill_colors.splice(this.fill_colors.length - 1, 1);
-                  this.stroke_colors.push(this.strokeColor);
-                  this.fill_colors.push(this.fillColor);
+                  this.stroke_colors.push(this.common_stroke_colors_for_labels[this.current_label]);
+                  this.fill_colors.push(this.common_fill_colors_for_labels[this.current_label]);
                 }
                 if (!(Object.keys(this.common_fill_colors_for_labels).includes(this.current_label))) {
                   this.labels_counter[this.current_label] = 1;
                   this.common_fill_colors_for_labels[this.current_label] = this.fill_colors[this.fill_colors.length-1];
-                  this.common_stroke_colors_for_labels[this.current_label] = this.strokeColor[this.stroke_colors.length-1];
+                  this.common_stroke_colors_for_labels[this.current_label] = this.stroke_colors[this.stroke_colors.length-1];
                 }
                 else if (!(Object.keys(this.labels_counter).includes(this.current_label))) {
                   this.labels_counter[this.current_label] = 1;
@@ -169,7 +146,6 @@ export default {
                 this.edition_count += 1;
                 this.unique_labels = [];
                 this.nr_labels = [];
-                console.log(this.labels_counter)
                 for (let key in this.labels_counter) {
                   if (this.labels_counter.hasOwnProperty(key)) {
                     this.unique_labels.push(key);
@@ -194,7 +170,24 @@ export default {
             image = this.imported[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
           else
             image = this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
-          console.log("tuż przed", this.rec_beg_x);
+          let element, previous;
+          let fatal_indexes = [];
+          for(let i = 0; i < this.labels.length; i++) {
+            element = this.rec_beg_x[i];
+            if (element === previous && this.rec_beg_y[i] === this.rec_beg_y[i - 1] && this.rec_w[i] === this.rec_w[i - 1] && this.rec_h[i] === this.rec_h[i - 1])
+              fatal_indexes.push(i);
+            previous = element;
+          }
+          for(let i = 0; i < fatal_indexes.length; i++)
+          {
+            this.labels.splice(fatal_indexes[i], 1);
+            this.rec_beg_x.splice(fatal_indexes[i], 1);
+            this.rec_beg_y.splice(fatal_indexes[i], 1);
+            this.rec_w.splice(fatal_indexes[i], 1);
+            this.rec_h.splice(fatal_indexes[i], 1);
+            this.stroke_colors.splice(fatal_indexes[i], 1);
+            this.fill_colors.splice(fatal_indexes[i], 1);
+          }
           const dict = {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
@@ -380,10 +373,6 @@ export default {
               else
                 this.labels_counter[this.labels[i]] = 1;
             }
-            for(let i = 0; i < this.common_stroke_colors_for_labels.length; i++)
-            {
-              console.log(this.common_stroke_colors_for_labels.values()[i])
-            }
             this.unique_labels = Object.keys(this.labels_counter);
             this.nr_labels = Object.values(this.labels_counter);
             this.drawAllRects();
@@ -392,9 +381,6 @@ export default {
         },
         drawAllRects()
         {
-          console.log(this.rec_beg_x.length);
-          console.log(this.rec_beg_x);
-          console.log(this)
           this.context.beginPath();
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
           for(let i = 0; i < this.rec_counter; i++)
@@ -474,7 +460,9 @@ export default {
                       this.context.closePath();
                     }
                     if (this.rec_counter === this.stroke_colors.length) {
+                      console.log(this.common_stroke_colors_for_labels);
                       this.strokeColor = this.getRandomRGB();
+                      console.log(this.strokeColor);
                       this.fillColor = this.strokeColor.map(function (x) {
                         return x * 1.5;
                       });
@@ -586,8 +574,8 @@ export default {
                       delete this.stroke_colors_for_labels[this.labels[i]];
                     }
                     this.labels.splice(i, 1);
-                    this.fill_colors.splice(this.labels.indexOf(this.labels[i]), 1);
-                    this.stroke_colors.splice(this.labels.indexOf(this.labels[i]), 1);
+                    this.fill_colors.splice(i, 1);
+                    this.stroke_colors.splice(i, 1);
                     this.unique_labels = [];
                     this.nr_labels = [];
                     for (let key in this.labels_counter) {
@@ -604,6 +592,8 @@ export default {
                 this.context.stroke();
                 this.context.closePath();
                 this.ifButtonRemoveClicked = false;
+                console.log("lab", this.common_fill_colors_for_labels);
+                console.log("col", this.fill_colors)
               }
             });
         },

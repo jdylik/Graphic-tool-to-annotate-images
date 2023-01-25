@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95f3ab76-f589-4043-a8e6-d3219efc415a" name="Changes" comment="implementacja eksportu - część pierwsza;&#10;zrobione: rozgraniczenie eksportu całości i wybranycyh zdjęć, eksport zdjęcia z formatu base64, wyświetlenie siatki zdjęć do wyboru;&#10;do zrobienia: checkboxy do wyboru zdjęć,&#10;przeskalowanie zdjęć,&#10;wybór nazwy projektu,&#10;złożenie pliku coco,&#10;eksport w zipie zdjęć i coco;">
-      <change beforePath="$PROJECT_DIR$/../client/src/views/Export.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/Export.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/60af5441-ac21-494a-87b2-e83d7f65951f.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/60af5441-ac21-494a-87b2-e83d7f65951f.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,26 +45,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/studia/IO/Software-engineering-project/server/app.py&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/Programowanie/Pycharm projects/Software-engineering-project/server/app.py",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\studia\IO\Software-engineering-project\server" />
@@ -70,13 +73,14 @@
   <component name="RunManager">
     <configuration name="Flask (app.py)" type="Python.FlaskServer" nameIsGenerated="true">
       <module name="server" />
-      <option name="target" value="D:\studia\IO\Software-engineering-project\server\app.py" />
+      <option name="target" value="D:\Programowanie\Pycharm projects\Software-engineering-project\server\app.py" />
       <option name="targetType" value="PATH" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="D:\Programowanie\Pycharm projects\Interpreter11\Scripts\python.exe" />
+      <option name="SDK_NAME" value="Python 3.11 (Interpreter11) (2)" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -133,6 +137,7 @@
       <workItem from="1674494667084" duration="28830000" />
       <workItem from="1674644555897" duration="10000" />
       <workItem from="1674644573371" duration="500000" />
+      <workItem from="1674672654330" duration="2199000" />
     </task>
     <task id="LOCAL-00001" summary="usunięcie polskich znaków w bazie">
       <created>1673348614589</created>
@@ -195,7 +200,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/baza_sql$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673789094825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1674644597145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1674679176228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$Flask.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673350456407" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$server.coverage" NAME="server Coverage Results" MODIFIED="1670847237825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
