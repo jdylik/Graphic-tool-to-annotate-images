@@ -4,9 +4,6 @@
     <Button v-if="!img_visible" label="Wybierz zdjęcia do eksportu" @click="loadAnnotatedImages(); img_visible=true;" class="tools"/>
     <Button v-if="img_visible" label="Eksportuj wybrane" @click=" exportNotAll()" class="tools" id="exp"/>
   </div>
-
-
-
   <div class="imggrid">
     <ul>
       <li v-if="img_visible" v-for="(image, imageIndex) in displayed_annotated_images" >
@@ -20,22 +17,6 @@
 import {app} from "@/main";
 import axios from "axios";
 
-function imageToDataUri(img) {
-    // create an off-screen canvas
-    var canvas = document.createElement('canvas'),
-        ctx = canvas.getContext('2d');
-
-    // set its dimension to target size
-    canvas.width = 200;
-    canvas.height = 150;
-
-    // draw source image into the off-screen canvas:
-    ctx.drawImage(img, 0, 0, width, height);
-
-    // encode image to data-uri with base64 version of compressed image
-    return canvas.toDataURL();
-}
-
 export default {
   name: "Export",
   data: function ()
@@ -44,6 +25,7 @@ export default {
       img_visible:false,
       annotated:[],
       displayed_annotated_images:[],
+      to_download:[],
     }
   },
   methods: {
@@ -67,23 +49,27 @@ export default {
           this.annotated = annotated;
           this.annotated_ind=annotated_ind;
           this.displayed_annotated_images=annotated;
-          // if (this.annotated.length < 4)
-          //   this.displayed_annotated_images = annotated.slice(0, this.annotated.length);
-          // else
-          //   this.displayed_annotated_images = annotated.slice(0, 4);
         },
-    async exportNotAll(){},
+    async exportNotAll(){
+      // tu jeszcze nic nie ma
+    },
     async exportAll() {
+      // tu beda zdjecia resizowane
+      const to_download=[];
       for(let i=0;i<this.annotated.length;i++)
       {
-
+        var resizebase64 = require('resize-base64');
+        var  img = resizebase64(this.annotated[i], 200, 150);
+        to_download.push(img);
       }
-          var a = document.createElement("a"); //Create <a>
-          console.log(this.annotated[0])
-          a.href = this.annotated[0]; //Image Base64 Goes here
-          a.download = "zdjecie.jpg"; //File name Here
-          a.click(); //Downloaded file
-        },
+      this.to_download=to_download;
+
+      // testowy download jednego zdj
+      var a = document.createElement("a"); //Create <a>
+      a.href = this.to_download[0]; //Image Base64 Goes here
+      a.download = "Image.png"; //File name Here
+      a.click(); //Downloaded file
+    },
 }}
 </script>
 
