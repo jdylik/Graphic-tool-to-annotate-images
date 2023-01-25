@@ -76,7 +76,7 @@ const routes = [
      {
     path:'/export',
     name:'Export',
-    component: Export,
+    component: () => import('../views/Export.vue'),
     beforeEnter:(to,from,next)=>{
       if (from.name === 'Export')
       {
