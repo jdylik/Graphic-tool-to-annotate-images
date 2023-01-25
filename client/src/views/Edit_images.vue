@@ -56,6 +56,7 @@
 import {app} from "@/main";
 import axios from "axios";
 import router from "@/router";
+
 export default {
   name: "Edit_images",
   data: function() {
@@ -97,8 +98,8 @@ export default {
       fillColor:[],
       if_deleted:false,
       work_option:"Tryb: ",
-      common_fill_colors_for_labels:[],
-      common_stroke_colors_for_labels:[],
+      common_fill_colors_for_labels:null,
+      common_stroke_colors_for_labels:null,
       source:'',
     }
   },
@@ -183,7 +184,6 @@ export default {
               document.getElementById("object_type").value = '';
           }
         },
-
         async exportData() {
           await router.push({path: '/export'});
         },
@@ -194,7 +194,7 @@ export default {
             image = this.imported[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
           else
             image = this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
-          console.log(this.rec_beg_x);
+          console.log("tuż przed", this.rec_beg_x);
           const dict = {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
@@ -380,6 +380,10 @@ export default {
               else
                 this.labels_counter[this.labels[i]] = 1;
             }
+            for(let i = 0; i < this.common_stroke_colors_for_labels.length; i++)
+            {
+              console.log(this.common_stroke_colors_for_labels.values()[i])
+            }
             this.unique_labels = Object.keys(this.labels_counter);
             this.nr_labels = Object.values(this.labels_counter);
             this.drawAllRects();
@@ -388,7 +392,9 @@ export default {
         },
         drawAllRects()
         {
-          console.log(this.rec_beg_x.length)
+          console.log(this.rec_beg_x.length);
+          console.log(this.rec_beg_x);
+          console.log(this)
           this.context.beginPath();
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
           for(let i = 0; i < this.rec_counter; i++)
