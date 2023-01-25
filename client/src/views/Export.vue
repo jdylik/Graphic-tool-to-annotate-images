@@ -10,7 +10,7 @@
   <div class="imggrid">
     <ul>
       <li v-if="img_visible" v-for="(image, imageIndex) in displayed_annotated_images" >
-        <img v-bind:id="imageIndex" :src="image" v-if="image" width="200" height="150"/>
+        <img v-bind:id="imageIndex" :src="image" v-if="image" width="200" height="150" class="img-grid"/>
       </li>
     </ul>
   </div>
@@ -19,7 +19,23 @@
 <script>
 import {app} from "@/main";
 import axios from "axios";
-import router from "@/router";
+
+function imageToDataUri(img) {
+    // create an off-screen canvas
+    var canvas = document.createElement('canvas'),
+        ctx = canvas.getContext('2d');
+
+    // set its dimension to target size
+    canvas.width = 200;
+    canvas.height = 150;
+
+    // draw source image into the off-screen canvas:
+    ctx.drawImage(img, 0, 0, width, height);
+
+    // encode image to data-uri with base64 version of compressed image
+    return canvas.toDataURL();
+}
+
 export default {
   name: "Export",
   data: function ()
@@ -58,14 +74,17 @@ export default {
         },
     async exportNotAll(){},
     async exportAll() {
+      for(let i=0;i<this.annotated.length;i++)
+      {
+
+      }
           var a = document.createElement("a"); //Create <a>
           console.log(this.annotated[0])
           a.href = this.annotated[0]; //Image Base64 Goes here
           a.download = "zdjecie.jpg"; //File name Here
           a.click(); //Downloaded file
         },
-  }
-}
+}}
 </script>
 
 <style scoped>
@@ -77,6 +96,14 @@ export default {
 .imggrid ul li{
   display: inline;
   margin: 10px 10px 10px 10px;
+}
+.img-grid{
+  margin-top:15px;
+  box-shadow: 2px 2px 4px rgba(70, 70, 70, 0.6);
+}
+.img-grid:hover{
+  box-shadow: 3px 3px 6px rgba(70, 70, 70, 0.8);
+  cursor: pointer;
 }
 
 </style>

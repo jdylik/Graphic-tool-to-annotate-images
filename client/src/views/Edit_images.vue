@@ -32,7 +32,7 @@
       <p class="sidebar-message">Wybierz zdjęcie do edycji</p>
       <ul>
       <li v-for="(image, index_l) in displayed_imported_images" id="import_list">
-        <img v-bind:id="index_l" :src="image" v-if="image" width="200" height="150" @click="selected(index_l,1)"/>
+        <img v-bind:id="index_l" :src="image" v-if="image" width="200" height="150" @click="selected(index_l,1)" class="img_bars"/>
       </li>
       </ul>
       <Button label="Załaduj więcej" @click="loadMoreImported()" id="moreL"/>
@@ -42,7 +42,7 @@
       <p class="sidebar-message">Wybierz zdjęcie do edycji</p>
       <ul>
       <li v-for="(image, index_r) in displayed_annotated_images" id="annotated_list">
-        <img v-bind:id="index_r" :src="image" v-if="image" width="200" height="150" @click="selected(index_r,2)"/>
+        <img v-bind:id="index_r" :src="image" v-if="image" width="200" height="150" @click="selected(index_r,2)" class="img_bars"/>
       </li>
       </ul>
       <Button label="Załaduj więcej" @click="loadMoreAnnotated()" id="moreR"/>
@@ -852,5 +852,13 @@ a{
 }
 .sidebar-message{
   color:#e0e1dd;
+}
+.img_bars{
+  box-shadow: 4px 4px 8px rgba(170, 170, 170, 0.6);
+  margin-top: 10px;
+}
+.img_bars:hover{
+  box-shadow: 6px 6px 9px rgba(170, 170, 170, 0.8);
+  cursor: pointer;
 }
 </style>
