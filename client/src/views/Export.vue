@@ -1,8 +1,11 @@
 <template>
   <div class="wrap">
     <Button label="Eksportuj wszystkie" @click="loadAnnotatedImages(); exportAll()" class="tools"/>
-    <Button label="Wybierz zdjęcia do eksportu" @click="loadAnnotatedImages(); exportNotAll(); img_visible=true;" class="tools"/>
+    <Button v-if="!img_visible" label="Wybierz zdjęcia do eksportu" @click="loadAnnotatedImages(); img_visible=true;" class="tools"/>
+    <Button v-if="img_visible" label="Eksportuj wybrane" @click=" exportNotAll()" class="tools" id="exp"/>
   </div>
+
+
 
   <div class="imggrid">
     <ul>
@@ -75,5 +78,6 @@ export default {
   display: inline;
   margin: 10px 10px 10px 10px;
 }
+
 </style>
 
