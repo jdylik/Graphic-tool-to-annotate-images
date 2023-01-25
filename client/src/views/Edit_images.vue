@@ -24,8 +24,8 @@
     </div>
 
     <div id="row2">
-      <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; visibleRight = false; loadImportedImages();" id="edit" class="tools"/>
-      <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true;visibleLeft = false; loadAnnotatedImages();" id="edit" class="tools"/>
+      <Button label="Edytuj nieadnotowane zdjęcie" @click="visibleLeft = true; visibleRight = false; loadImportedImages();" id="editimp" class="tools"/>
+      <Button label="Edytuj adnotowane zdjęcie" @click="visibleRight = true;visibleLeft = false; loadAnnotatedImages();" id="editann" class="tools"/>
     </div>
 
     <Sidebar v-model:visible="visibleLeft" position="left" class="sidebar_left" id="sidebar_left">
@@ -42,7 +42,7 @@
       <p class="sidebar-message">Wybierz zdjęcie do edycji</p>
       <ul>
       <li v-for="(image, index_r) in displayed_annotated_images" id="annotated_list">
-        <img v-bind:id="index_r" :src="image" v-if="image" width="200" height="150" @click="selected(index_r,1)"/>
+        <img v-bind:id="index_r" :src="image" v-if="image" width="200" height="150" @click="selected(index_r,2)"/>
       </li>
       </ul>
       <Button label="Załaduj więcej" @click="loadMoreAnnotated()" id="moreR"/>
@@ -90,12 +90,15 @@ export default {
       unique_colors:[],
       fill_colors:[],
       stroke_colors:[],
-      fill_colors_for_labels:[],
-      stroke_colors_for_labels:[],
+      //fill_colors_for_labels:[],
+      //stroke_colors_for_labels:[],
       strokeColor:[],
       fillColor:[],
       if_deleted:false,
       work_option:"Tryb: ",
+      common_fill_colors_for_labels:[],
+      common_stroke_colors_for_labels:[],
+      source:'',
     }
   },
   methods:
@@ -115,54 +118,56 @@ export default {
                   this.labels.splice(this.labels.length - 1, 1);
                 }
                 this.labels.push(this.current_label);
-                if (Object.keys(this.fill_colors_for_labels).includes(this.current_label)) {
+                if (Object.keys(this.common_fill_colors_for_labels).includes(this.current_label)) {
+                  console.log(this.common_stroke_colors_for_labels);
                   this.stroke_colors.splice(this.stroke_colors.length - 1, 1);
                   this.fill_colors.splice(this.fill_colors.length - 1, 1);
-                  this.stroke_colors.push(this.stroke_colors_for_labels[this.current_label]);
-                  this.fill_colors.push(this.fill_colors_for_labels[this.current_label]);
-                } else if (this.edition_count !== 0 && Object.keys(this.fill_colors_for_labels).includes(this.previous_label)) {
+                  let strokes = JSON.stringify(this.common_stroke_colors_for_labels[this.current_label]).split(", ");
+                  let stroke = [];
+                  stroke.push(parseFloat(strokes[0].split("\"[")[1]));
+                  stroke.push(parseFloat(strokes[1]));
+                  stroke.push(parseFloat(strokes[2].split("]")[0]));
+                  console.log(stroke);
+                  this.stroke_colors.push(stroke);
+                  let fills = JSON.stringify(this.common_fill_colors_for_labels[this.current_label]).split(", ");
+                  let fill = [];
+                  fill.push(parseFloat(fills[0].split("\"[")[1]));
+                  fill.push(parseFloat(fills[1]));
+                  fill.push(parseFloat(fills[2].split("]")[0]));
+                  this.fill_colors.push(fill);
+                } else if (this.edition_count !== 0 && Object.keys(this.common_fill_colors_for_labels).includes(this.previous_label)) {
                   this.strokeColor = this.getRandomRGB();
                   this.fillColor = this.strokeColor.map(function (x) {
                     return x * 1.5;
                   });
-                  this.stroke_colors.splice(this.stroke_colors.length - 1, 1);
-                  this.fill_colors.splice(this.fill_colors.length - 1, 1);
+                  this.stroke_colors.pop();
+                  this.fill_colors.pop();
+                  //this.stroke_colors.splice(this.stroke_colors.length - 1, 1);
+                  //this.fill_colors.splice(this.fill_colors.length - 1, 1);
                   this.stroke_colors.push(this.strokeColor);
                   this.fill_colors.push(this.fillColor);
                 }
-                if (Object.keys(this.labels_counter).length === 0) {
+                if (!(Object.keys(this.common_fill_colors_for_labels).includes(this.current_label))) {
                   this.labels_counter[this.current_label] = 1;
-                  this.fill_colors_for_labels[this.current_label] = this.fillColor;
-                  this.stroke_colors_for_labels[this.current_label] = this.strokeColor;
-                } else {
-                  if (this.current_label in this.labels_counter) {
-                    this.labels_counter[this.current_label] += 1;
-                  } else {
-                    this.labels_counter[this.current_label] = 1;
-                    this.fill_colors_for_labels[this.current_label] = this.fillColor;
-                    this.stroke_colors_for_labels[this.current_label] = this.strokeColor;
-                  }
-                  if (this.previous_label !== '' && this.previous_label !== this.current_label && this.edition_count !== 0) {
-                    if (this.labels_counter[this.previous_label] === 1) {
-                      delete this.labels_counter[this.previous_label];
-                      delete this.fill_colors_for_labels[this.previous_label];
-                      delete this.stroke_colors_for_labels[this.previous_label];
-                    } else {
-                      this.labels_counter[this.previous_label] -= 1;
-                    }
-                  }
+                  this.common_fill_colors_for_labels[this.current_label] = this.fill_colors[this.fill_colors.length-1];
+                  this.common_stroke_colors_for_labels[this.current_label] = this.strokeColor[this.stroke_colors.length-1];
                 }
-                if (this.labels_counter[this.previous_label] > 1 && this.edition_count !== 0)
+                else if (!(Object.keys(this.labels_counter).includes(this.current_label))) {
+                  this.labels_counter[this.current_label] = 1;
+                }else
+                {
+                  this.labels_counter[this.current_label] += 1;
+                }
+                if (this.previous_label !== this.current_label && this.labels_counter[this.previous_label] > 1 && this.edition_count !== 0)
                   this.labels_counter[this.previous_label] -= 1;
-                else if (this.labels_counter[this.previous_label] < 1 && this.edition_count !== 0) {
+                else if (this.previous_label !== this.current_label && this.labels_counter[this.previous_label] <= 1 && this.edition_count !== 0) {
                   delete this.labels_counter[this.previous_label];
-                  delete this.fill_colors_for_labels[this.previous_label];
-                  delete this.stroke_colors_for_labels[this.previous_label];
                 }
                 this.previous_label = this.current_label;
                 this.edition_count += 1;
                 this.unique_labels = [];
                 this.nr_labels = [];
+                console.log(this.labels_counter)
                 for (let key in this.labels_counter) {
                   if (this.labels_counter.hasOwnProperty(key)) {
                     this.unique_labels.push(key);
@@ -170,7 +175,7 @@ export default {
                   }
                 }
                 this.drawAllRects();
-                this.work_option="Tryb: ";
+                this.work_option = "Tryb: ";
               } else
                 document.getElementById("object_type").value = '';
             } else
@@ -179,11 +184,17 @@ export default {
         },
 
         async saveAnnotations() {
+          let image = '';
+          if (this.source === 'importowane')
+            image = this.imported[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
+          else
+            image = this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
+          console.log(this.rec_beg_x);
           const dict = {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
             "labels": this.labels,
-            "image index": this.current_real_id,
+            "image": image,
             "rec_beg_x": this.rec_beg_x,
             "rec_beg_y": this.rec_beg_y,
             "rec_w": this.rec_w,
@@ -192,6 +203,11 @@ export default {
             "stroke_colors":this.stroke_colors,
           };
           await axios.post("http://localhost:5000/save_annotations", {params: JSON.stringify(dict)})
+          this.context.reset();
+          this.current_img = null;
+          this.labels_counter = [];
+          this.unique_labels = [];
+          this.nr_labels = [];
         },
 
         async loadImportedImages() {
@@ -219,38 +235,38 @@ export default {
           const dict = {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
-
           };
           const annotated = [];
           const annotated_ind = [];                                                                                                                                                                                                                                                                                                                                                                                                                                                                             0
-          await axios.post("http://localhost:5000/get_annotated_images", {params: JSON.stringify(dict)}).then(function (response) {
+          await axios.post("http://localhost:5000/get_annotated_images_no_rects", {params: JSON.stringify(dict)}).then(function (response) {
             let data = response.data["images"];
             for(let i = 0; i < data.length; i++)
             {
-              let canvas = document.createElement('canvas');
-              canvas.width = 200;
-              canvas.height = 150;
-              let ctx = canvas.getContext('2d');
+              //let canvas = document.createElement('canvas');
+              //canvas.width = 200;
+              //canvas.height = 150;
+              //let ctx = canvas.getContext('2d');
               //ctx.globalAlpha = 1;
-              let image = new Image();
-              ctx.fillStyle = '#fff';
-              ctx.fillRect(0, 0, canvas.width, canvas.height);
-              image.onload = function() {
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-              };
-              image.src = "data:image/jpeg;base64," + data[i][1];
-              let start_x = data[i][2];
-              let start_y = data[i][3];
-              let width = data[i][4];
-              let height = data[i][5];
-              let label = data[i][6];
-              ctx.fillStyle = `rgb(${data[i][8].toString().split(",")[0].split("[")[1]}, ${data[i][8].toString().split(",")[1]}, ${data[i][8].toString().split(",")[2].split("]")[0]})`;
-              ctx.fillRect(start_x / 3.33, start_y / 3.33, width / 3.33, height / 3.33);
+              //let image = document.createElement('image');
+              //ctx.fillStyle = '#fff';
+              //ctx.fillRect(0, 0, canvas.width, canvas.height);
+              //image.onload = function() {
+               // ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+              //};
+              //image.src = "data:image/jpeg;base64," + data[i][1];
+              //let start_x = data[i][2];
+              //let start_y = data[i][3];
+              //let width = data[i][4];
+              //let height = data[i][5];
+              //let label = data[i][6];
+              //ctx.fillStyle = `rgb(${data[i][8].toString().split(",")[0].split("[")[1]}, ${data[i][8].toString().split(",")[1]}, ${data[i][8].toString().split(",")[2].split("]")[0]})`;
+              //ctx.fillRect(start_x / 3.33, start_y / 3.33, width / 3.33, height / 3.33);
               //ctx.strokeRect(start_x, start_y, width, height);
               //let stroke_color = "rgb(" + data[i][7].toString().split(",")[0].split("[")[7] + ", " + data[i][7].toString().split(",")[1] + ", " + data[i][7].toString().split(",")[2].split("]")[0] + ")";
-              let url = canvas.toDataURL('image/jpeg');
+              //let url = canvas.toDataURL('image/jpeg');
               //ctx.strokeRect(start_x, start_y, width, height);
-              annotated.push(url);
+              annotated.push("data:image/jpeg;base64," + data[i]);
+              annotated_ind.push(response.data["indexes"][i][0]);
             }
             return annotated;
           });
@@ -278,6 +294,7 @@ export default {
             this.displayed_annotated_images.push.apply(this.displayed_annotated_images, this.annotated.slice(length, length + 4));
         },
         async selected(index,num) {
+          this.source = 'importowane';
           this.work_option="Tryb: ";
           this.indexOfCurrentImage = index;
           this.current_real_id=this.imported_ind[index];
@@ -306,42 +323,67 @@ export default {
           this.context.globalAlpha = 1;
           this.context.clearRect(0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33)
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
+          this.context.globalAlpha = 1;
           if (num===2)
           {
+            this.source = 'adnotowane';
             const dict = {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
-              "image index": this.current_real_id
+            "image": this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1],
             };
             const rec_beg_x=[];
             const rec_beg_y=[];
             const rec_w=[];
             const rec_h=[];
             const labels=[];
-            this.stroke_colors = [];
-            this.fill_colors = [];
-            await axios.post("http://localhost:5000/get_annotations", {params: JSON.stringify(dict)}).then(function (response) {
+            const stroke_colors=[];
+            const fill_colors=[];
+            let response = await axios.post("http://localhost:5000/get_annotations", {params: JSON.stringify(dict)})//.then(function (response) {
             for (let i = 0; i < response.data["rect index"].length; i++) {
               rec_beg_x.push(response.data["rec_beg_x"][i]);
               rec_beg_y.push(response.data["rec_beg_y"][i]);
               rec_w.push(response.data["rec_w"][i]);
               rec_h.push(response.data["rec_h"][i]);
               labels.push(response.data["labels"][i]);
+              let strokes = response.data["stroke_cols"][i].split(", ");
+              let stroke = [];
+              stroke.push(parseFloat(strokes[0].split("[")[1]));
+              stroke.push(parseFloat(strokes[1]));
+              stroke.push(parseFloat(strokes[2].split("]")[0]));
+              stroke_colors.push(stroke);
+              let fills = response.data["fill_cols"][i].split(", ");
+              let fill = [];
+              fill.push(parseFloat(fills[0].split("[")[1]));
+              fill.push(parseFloat(fills[1]));
+              fill.push(parseFloat(fills[2].split("]")[0]));
+              fill_colors.push(fill);
             }
-          });
             this.rec_beg_x=rec_beg_x;
             this.rec_beg_y=rec_beg_y
             this.rec_w=rec_w;
             this.rec_h=rec_h;
             this.labels=labels;
+            this.stroke_colors=stroke_colors;
+            this.fill_colors=fill_colors;
             this.rec_counter=this.rec_beg_x.length;
-	          this.unique_labels=Array.from(new Set(this.labels));
+            for (let i = 0; i < this.labels.length; i++)
+            {
+              if (this.labels[i] in Object.keys(this.labels_counter)) {
+                this.labels_counter[this.labels[i]] += 1;
+              }
+              else
+                this.labels_counter[this.labels[i]] = 1;
+            }
+            this.unique_labels = Object.keys(this.labels_counter);
+            this.nr_labels = Object.values(this.labels_counter);
             this.drawAllRects();
           }
 
         },
         drawAllRects()
         {
+          console.log(this.rec_beg_x.length)
           this.context.beginPath();
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
           for(let i = 0; i < this.rec_counter; i++)
@@ -398,8 +440,11 @@ export default {
               let draw = false;
               this.is_rect_finished = false;
               window.addEventListener("mousedown", (e) => {
-                if (e.target.localName === 'canvas' && this.ifButtonDrawClicked)
+                if (e.target.localName === 'canvas' && this.ifButtonDrawClicked) {
                   this.if_deleted = false;
+                  this.visibleLeft = false;
+                  this.visibleRight = false;
+                }
                 if (e.target.localName === 'canvas') {
                   if(this.ifButtonDrawClicked === true)
                   if (this.ifButtonRemoveClicked !== true && this.ifButtonDrawClicked === true) {
@@ -590,9 +635,9 @@ export default {
           let com_fill = [];
           let com_str = [];
           await axios.post("http://localhost:5000/get_categories", {params: JSON.stringify(req_dict)}).then(function (response) {
-              if ("empty" in response.data)
+            if (response.data === 1)
               {}
-              else
+            else
               {
                 for (let i = 0; i < response.data["names"].length; i++) {
                   com_fill[response.data["names"][i]] = response.data["fill_colors"][i];
