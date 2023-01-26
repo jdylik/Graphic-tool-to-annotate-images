@@ -8,10 +8,10 @@
     <Button v-if="img_visible" label="Eksportuj wszystkie" @click="loadAnnotatedImages(); exportAll();" class="tools"/>
     <Button v-if="img_visible" label="Eksportuj wybrane" @click=" loadAnnotatedImages();exportNotAll()" class="tools" id="exp"/>
   </div>
-  <div class="imggrid">
-    <ul>
-      <li v-if="img_visible" v-for="(image, imageIndex) in displayed_annotated_images" >
-        <img v-bind:id="imageIndex" :src="image" v-if="image" width="200" height="150" class="img-grid"/>
+  <div class="imggrid" >
+    <ul class="imggridul">
+      <li v-if="img_visible" v-for="(image, imageIndex) in displayed_annotated_images" class="imggridli">
+        <img v-bind:id="imageIndex" :src="image" v-if="image" width="200" height="150" class="img-grid" @click="selected(imageIndex)"/>
       </li>
     </ul>
   </div>
@@ -21,7 +21,6 @@
 
 import {app} from "@/main";
 import axios from "axios";
-import resizebase64 from "resize-base64";
 import JSZip from "jszip";
 import { saveAs } from 'file-saver';
 
@@ -47,8 +46,11 @@ const saveZip = (filename, urls) => {
     folder.generateAsync({ type: "blob" }).then(content => saveAs(content, filename));
 };
 
+
+
 export default {
   name: "Export",
+
   data: function ()
   {
     return{
@@ -57,6 +59,9 @@ export default {
       displayed_annotated_images:[],
       to_download:[],
       p_name:"project",
+      indexOfCurrentImage:null,
+      current_img:null,
+      chosen_ind:[],
     }
   },
   methods: {
@@ -82,11 +87,13 @@ export default {
           this.displayed_annotated_images=annotated;
         },
     async exportNotAll(){
-      // tu jeszcze nic nie ma
+      await this.loadAnnotatedImages();
+
     },
 
     async exportAll() {
       await this.loadAnnotatedImages();
+      // to nie jest przechwytywane jako faktyczna nazwa - nie dziala
       // this.p_name=document.getElementById('project_name').value;
       if(this.annotated)
       {
@@ -102,8 +109,22 @@ export default {
         this.to_download=to_download;
         saveZip(this.p_name,this.to_download);
       }
-
     },
+     async selected(index) {
+          // to jest warunek na usuwanie zaznaczenia jesli istnieje - w tej chwili nie dziala
+          if(document.getElementById(index).style.border==="5px solid yellow")
+          {
+            document.getElementById(index).style.border=""
+            let to_remove=this.chosen_ind.indexOf(index);
+            delete this.chosen_ind[to_remove];
+          }
+          // zaznaczanie - w efekcie zolta ramka na zaznaczonym zdj
+          this.indexOfCurrentImage = index;
+          this.current_img = document.getElementById(index);
+          document.getElementById(index).style.border="5px solid yellow";
+          this.chosen_ind.push(index)
+
+        },
 }}
 </script>
 
