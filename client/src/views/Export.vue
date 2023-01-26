@@ -23,6 +23,7 @@ import {app} from "@/main";
 import axios from "axios";
 import JSZip from "jszip";
 import { saveAs } from 'file-saver';
+import resizebase64 from "resize-base64";
 
 function b64toBlob(dataURI) {
 
@@ -86,15 +87,8 @@ export default {
           this.annotated_ind=annotated_ind;
           this.displayed_annotated_images=annotated;
         },
-    async exportNotAll(){
+    async exportAll(){
       await this.loadAnnotatedImages();
-
-    },
-
-    async exportAll() {
-      await this.loadAnnotatedImages();
-      // to nie jest przechwytywane jako faktyczna nazwa - nie dziala
-      // this.p_name=document.getElementById('project_name').value;
       if(this.annotated)
       {
         console.log(this.annotated);
@@ -110,20 +104,41 @@ export default {
         saveZip(this.p_name,this.to_download);
       }
     },
-     async selected(index) {
-          // to jest warunek na usuwanie zaznaczenia jesli istnieje - w tej chwili nie dziala
-          if(document.getElementById(index).style.border==="5px solid yellow")
-          {
-            document.getElementById(index).style.border=""
-            let to_remove=this.chosen_ind.indexOf(index);
-            delete this.chosen_ind[to_remove];
-          }
-          // zaznaczanie - w efekcie zolta ramka na zaznaczonym zdj
-          this.indexOfCurrentImage = index;
-          this.current_img = document.getElementById(index);
-          document.getElementById(index).style.border="5px solid yellow";
-          this.chosen_ind.push(index)
 
+    async exportNotAll() {
+      await this.loadAnnotatedImages();
+      // to nie jest przechwytywane jako faktyczna nazwa - nie dziala
+      // this.p_name=document.getElementById('project_name').value;
+      if(this.annotated)
+      {
+        console.log(this.chosen_ind);
+        const to_download=[];
+        for(let i=0;i<this.chosen_ind.length;i++)
+        {
+          var resizebase64 = require('resize-base64');
+          var  img = resizebase64(this.annotated[this.chosen_ind[i]], 666, 500);
+          var blob = b64toBlob(img);
+          to_download.push(blob);
+        }
+        this.to_download=to_download;
+        saveZip(this.p_name,this.to_download);
+      }
+    },
+     async selected(index) {
+            this.current_img = document.getElementById(index);
+            console.log(this.annotated.length)
+            console.log(this.chosen_ind)
+            if (this.chosen_ind.includes(index)) {
+              console.log(index)
+              this.current_img.style.border = "5px solid white";
+              this.chosen_ind.splice(this.chosen_ind.indexOf(index), 1);
+            }
+            else {
+              this.indexOfCurrentImage = index;
+              console.log(index)
+              this.current_img.style.border = "5px solid yellow";
+              this.chosen_ind.push(index)
+            }
         },
 }}
 </script>
