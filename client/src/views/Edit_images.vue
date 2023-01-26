@@ -2,7 +2,8 @@
 <template>
   <div id="pageWrap">
     <p>{{work_option}}</p>
-    <div id="add_data">
+    <div id="kanwas">
+          <div id="add_data">
       <p>{{"Wybierz nazwę pliku"}}</p>
         <input type="text" id="file_name" v-on:keyup.enter="onEnterFileName"/>
       <p>{{"Wybierz rodzaj kamery"}}</p>
@@ -10,7 +11,6 @@
       <p>{{"Wpisz lokalizację wykonania zdjęcia"}}</p>
         <input type="text" id="location" v-on:keyup.enter="onEnterLocation"/>
     </div>
-    <div id="kanwas">
       <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
       <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
       <div id="lista">

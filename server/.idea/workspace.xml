@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95f3ab76-f589-4043-a8e6-d3219efc415a" name="Changes" comment="implementacja eksportu - część pierwsza;&#10;zrobione: rozgraniczenie eksportu całości i wybranycyh zdjęć, eksport zdjęcia z formatu base64, wyświetlenie siatki zdjęć do wyboru;&#10;do zrobienia: checkboxy do wyboru zdjęć,&#10;przeskalowanie zdjęć,&#10;wybór nazwy projektu,&#10;złożenie pliku coco,&#10;eksport w zipie zdjęć i coco;">
-      <change beforePath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" afterDir="false" />
+    <list default="true" id="95f3ab76-f589-4043-a8e6-d3219efc415a" name="Changes" comment="rozwinięcie bazy - przechowywanie informacji o adnotacjach">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
@@ -48,7 +48,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/Programowanie/Pycharm projects/Software-engineering-project/server/app.py",
+    "last_opened_file_path": "D:/studia/IO/Software-engineering-project/server/app.py",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -71,12 +71,12 @@
   <component name="RunManager">
     <configuration name="Flask (app.py)" type="Python.FlaskServer" nameIsGenerated="true">
       <module name="server" />
-      <option name="target" value="D:\Programowanie\Pycharm projects\Software-engineering-project\server\app.py" />
+      <option name="target" value="D:\studia\IO\Software-engineering-project\server\app.py" />
       <option name="targetType" value="PATH" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="D:\Programowanie\Pycharm projects\Interpreter11\Scripts\python.exe" />
-      <option name="SDK_NAME" value="Python 3.11 (Interpreter11) (2)" />
+      <option name="SDK_HOME" value="C:\Users\Adrian\AppData\Local\Programs\Python\Python310\python.exe" />
+      <option name="SDK_NAME" value="Python 3.10" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -132,11 +132,6 @@
       <workItem from="1673885913518" duration="2239000" />
       <workItem from="1674170779340" duration="4476000" />
       <workItem from="1674190270313" duration="5244000" />
-      <workItem from="1674494667084" duration="28830000" />
-      <workItem from="1674644555897" duration="10000" />
-      <workItem from="1674644573371" duration="500000" />
-      <workItem from="1674672654330" duration="2199000" />
-      <workItem from="1674698909332" duration="1247000" />
     </task>
     <task id="LOCAL-00001" summary="usunięcie polskich znaków w bazie">
       <created>1673348614589</created>
@@ -166,14 +161,7 @@
       <option name="project" value="LOCAL" />
       <updated>1673848663262</updated>
     </task>
-    <task id="LOCAL-00005" summary="implementacja eksportu - część pierwsza;&#10;zrobione: rozgraniczenie eksportu całości i wybranycyh zdjęć, eksport zdjęcia z formatu base64, wyświetlenie siatki zdjęć do wyboru;&#10;do zrobienia: checkboxy do wyboru zdjęć,&#10;przeskalowanie zdjęć,&#10;wybór nazwy projektu,&#10;złożenie pliku coco,&#10;eksport w zipie zdjęć i coco;">
-      <created>1674655110220</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1674655110220</updated>
-    </task>
-    <option name="localTasksCounter" value="6" />
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -194,13 +182,12 @@
     <MESSAGE value="usunięcie polskich znaków w bazie" />
     <MESSAGE value="longtexty" />
     <MESSAGE value="rozwinięcie bazy - przechowywanie informacji o adnotacjach" />
-    <MESSAGE value="implementacja eksportu - część pierwsza;&#10;zrobione: rozgraniczenie eksportu całości i wybranycyh zdjęć, eksport zdjęcia z formatu base64, wyświetlenie siatki zdjęć do wyboru;&#10;do zrobienia: checkboxy do wyboru zdjęć,&#10;przeskalowanie zdjęć,&#10;wybór nazwy projektu,&#10;złożenie pliku coco,&#10;eksport w zipie zdjęć i coco;" />
-    <option name="LAST_COMMIT_MESSAGE" value="implementacja eksportu - część pierwsza;&#10;zrobione: rozgraniczenie eksportu całości i wybranycyh zdjęć, eksport zdjęcia z formatu base64, wyświetlenie siatki zdjęć do wyboru;&#10;do zrobienia: checkboxy do wyboru zdjęć,&#10;przeskalowanie zdjęć,&#10;wybór nazwy projektu,&#10;złożenie pliku coco,&#10;eksport w zipie zdjęć i coco;" />
+    <option name="LAST_COMMIT_MESSAGE" value="rozwinięcie bazy - przechowywanie informacji o adnotacjach" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/baza_sql$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673789094825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1674712474922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/baza_sql$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1674409259123" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$Flask.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673350456407" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$server.coverage" NAME="server Coverage Results" MODIFIED="1670847237825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673886044968" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
