@@ -150,7 +150,6 @@ def get_annotated_images():
                 images.append(adns)
                 adns = []
         cur.close()
-        # print(images)
         return json.dumps({"images": images}, ensure_ascii=False)
     except Exception:
         cur.close()
@@ -165,7 +164,6 @@ def save_annotations():
     login = data["login"]
     password = data["password"]
     labels = data["labels"]
-    print(data)
     unique_labels = []
     unique_indexes = []
     for i, element in enumerate(labels):
@@ -227,13 +225,11 @@ def save_annotations():
                             (labels[index], image_id, rec_beg_x[index], rec_beg_y[index], rec_w[index], rec_h[index]))
                         mysql.connection.commit()
         else:
-            # print("c", len(labels), labels, unique_labels, str(unique_stroke_c[1]))
             for i in range(0, len(labels)):
                 cur.execute("SELECT COUNT(*) FROM kategorie WHERE nazwa = %s AND id_uz = %s", (labels[i], id))
                 if_exists = cur.fetchall()
                 if_exists = if_exists[0][0]
                 if int(if_exists) == 0:
-                    # print(unique_stroke_c[i])
                     cur.execute("INSERT INTO kategorie (nazwa, szkic_kolor, wyp_kolor, id_uz) VALUES (%s, %s, %s, %s)",
                                 (unique_labels[i], str(unique_stroke_c[i]), str(unique_fill_c[i]), id))
                     mysql.connection.commit()
@@ -251,6 +247,71 @@ def save_annotations():
         cur.close()
         return "Ojojoj"
 
+@app.route('/save_image_info', methods=['POST'])
+def save_image_info():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    image = data["image"]
+    name = data["name"]
+    camera = data["camera"]
+    location = data["location"]
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT id_o FROM import WHERE obraz = %s AND id_uz = %s", (image, id))
+        image_id = cur.fetchall()
+        image_id = image_id[0][0]
+        cur.execute("SELECT COUNT(*) FROM info WHERE id_o = %s", (image_id,))
+        if_exists = cur.fetchall()
+        if_exists = if_exists[0][0]
+        if int(if_exists) == 0:
+            cur.execute("INSERT INTO info (id_o, rodz_kam, pochodzenie, nazwa_pliku) VALUES (%s, %s, %s, %s)", (image_id, camera, location, name))
+        else:
+            cur.execute("UPDATE info SET rodz_kam = (%s), pochodzenie = (%s), nazwa_pliku = (%s) WHERE id_o = (%s)", (camera, location, name, image_id))
+        mysql.connection.commit()
+        cur.close()
+        return "Sukces"
+    except Exception:
+        cur.close()
+        return "Ojojoj"
+@app.route('/get_image_info', methods=['POST'])
+def get_image_info():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    image = data["image"]
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT id_o FROM import WHERE obraz = %s AND id_uz = %s", (image, id))
+        image_id = cur.fetchall()
+        image_id = image_id[0][0]
+        cur.execute("SELECT COUNT(*) FROM info WHERE id_o = %s", (image_id,))
+        if_exists = cur.fetchall()
+        if_exists = if_exists[0][0]
+        if int(if_exists) == 0:
+            cur.close()
+            return "0"
+        else:
+            cur.execute("SELECT rodz_kam, pochodzenie, nazwa_pliku FROM info WHERE id_o = %s", (image_id,))
+            data = cur.fetchall()
+            data = data[0]
+        cur.close()
+        print("d", data)
+        return json.dumps({"description": data}, ensure_ascii=False)
+    except Exception:
+        cur.execute("SELECT rodz_kam, pochodzenie, nazwa_pliku FROM info WHERE id_o = %s", (image_id,))
+        cur.close()
+        return "Ojojoj"
 
 @app.route('/get_annotations', methods=['POST'])
 def get_annotations():
@@ -293,7 +354,19 @@ def get_annotations():
             stroke_colors.append(cat_data[0][2])
         mysql.connection.commit()
         cur.close()
-        print(rec_h)
+        unique_indexes = []
+        unique_elements = []
+        for index, element in enumerate(rec_beg_x):
+            if element not in unique_elements:
+                unique_elements.append(element)
+                unique_indexes.append(index)
+        rec_beg_x = unique_elements
+        rec_beg_y = [rec_beg_y[i] for i in unique_indexes]
+        rec_w= [rec_w[i] for i in unique_indexes]
+        rec_h = [rec_h[i] for i in unique_indexes]
+        labels = [labels[i] for i in unique_indexes]
+        stroke_colors = [stroke_colors[i] for i in unique_indexes]
+        fill_colors = [fill_colors[i] for i in unique_indexes]
         return json.dumps({"rect index": rect_indexes, "rec_beg_x": rec_beg_x, "rec_beg_y": rec_beg_y, "rec_w": rec_w,
                            "rec_h": rec_h, "labels": labels, "stroke_cols": stroke_colors, "fill_cols": fill_colors},
                           ensure_ascii=False)

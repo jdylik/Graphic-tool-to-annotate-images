@@ -2,6 +2,14 @@
 <template>
   <div id="pageWrap">
     <p>{{work_option}}</p>
+    <div id="add_data">
+      <p>{{"Wybierz nazwę pliku"}}</p>
+        <input type="text" id="file_name" v-on:keyup.enter="onEnterFileName"/>
+      <p>{{"Wybierz rodzaj kamery"}}</p>
+        <input type="text" id="camera_type" v-on:keyup.enter="onEnterCameraType"/>
+      <p>{{"Wpisz lokalizację wykonania zdjęcia"}}</p>
+        <input type="text" id="location" v-on:keyup.enter="onEnterLocation"/>
+    </div>
     <div id="kanwas">
       <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
       <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
@@ -101,10 +109,46 @@ export default {
       common_fill_colors_for_labels:null,
       common_stroke_colors_for_labels:null,
       source:'',
+      file_name:'',
+      camera_type:'',
+      location:'',
     }
   },
   methods:
       {
+        onEnterFileName: function()
+        {
+          if (this.current_img !== null) {
+            let file_name = document.getElementById("file_name").value;
+            if (file_name !== '' && !file_name.includes(" ") && !file_name.includes("\"")) {
+              this.file_name = file_name;
+            }
+          }
+          else
+            document.getElementById("file_name").value = '';
+        },
+        onEnterCameraType: function()
+        {
+          if (this.current_img !== null) {
+            let camera_type = document.getElementById("camera_type").value;
+            if (camera_type !== '' && !camera_type.includes("\"")) {
+              this.camera_type = camera_type;
+            }
+          }
+          else
+            document.getElementById("camera_type").value = '';
+        },
+        onEnterLocation: function()
+        {
+          if (this.current_img !== null) {
+            let location = document.getElementById("location").value;
+            if (location !== '' && !location.includes("\"")) {
+              this.location = location;
+            }
+          }
+          else
+            document.getElementById("location").value = '';
+        },
         onEnter:function() {
           this.ifButtonDrawClicked = false;
           if (document.getElementById("object_type").value !== '') {
@@ -165,47 +209,67 @@ export default {
         },
 
         async saveAnnotations() {
-          let image = '';
-          if (this.source === 'importowane')
-            image = this.imported[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
-          else
-            image = this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
-          let element, previous;
-          let fatal_indexes = [];
-          for(let i = 0; i < this.labels.length; i++) {
-            element = this.rec_beg_x[i];
-            if (element === previous && this.rec_beg_y[i] === this.rec_beg_y[i - 1] && this.rec_w[i] === this.rec_w[i - 1] && this.rec_h[i] === this.rec_h[i - 1])
-              fatal_indexes.push(i);
-            previous = element;
+          if (document.getElementById("file_name").value !== '') {
+            let image = '';
+            if (this.source === 'importowane')
+              image = this.imported[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
+            else
+              image = this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
+            let element, previous;
+            let fatal_indexes = [];
+            for (let i = 0; i < this.labels.length; i++) {
+              element = this.rec_beg_x[i];
+              if (element === previous && this.rec_beg_y[i] === this.rec_beg_y[i - 1] && this.rec_w[i] === this.rec_w[i - 1] && this.rec_h[i] === this.rec_h[i - 1])
+                fatal_indexes.push(i);
+              previous = element;
+            }
+            for (let i = 0; i < fatal_indexes.length; i++) {
+              this.labels.splice(fatal_indexes[i], 1);
+              this.rec_beg_x.splice(fatal_indexes[i], 1);
+              this.rec_beg_y.splice(fatal_indexes[i], 1);
+              this.rec_w.splice(fatal_indexes[i], 1);
+              this.rec_h.splice(fatal_indexes[i], 1);
+              this.stroke_colors.splice(fatal_indexes[i], 1);
+              this.fill_colors.splice(fatal_indexes[i], 1);
+            }
+            const inf_dict = {
+              "login": app.config.globalProperties.$login.value,
+              "password": app.config.globalProperties.$password.value,
+              "image": image,
+              "name": this.file_name,
+              "camera": '',
+              "location": '',
+            }
+            if (this.camera_type !== '')
+              inf_dict["camera"] = this.camera_type;
+            if (this.location !== '')
+              inf_dict["location"] = this.location;
+            await axios.post("http://localhost:5000/save_image_info", {params: JSON.stringify(inf_dict)})
+            const dict = {
+              "login": app.config.globalProperties.$login.value,
+              "password": app.config.globalProperties.$password.value,
+              "labels": this.labels,
+              "image": image,
+              "rec_beg_x": this.rec_beg_x,
+              "rec_beg_y": this.rec_beg_y,
+              "rec_w": this.rec_w,
+              "rec_h": this.rec_h,
+              "fill_colors": this.fill_colors,
+              "stroke_colors": this.stroke_colors,
+            };
+            await axios.post("http://localhost:5000/save_annotations", {params: JSON.stringify(dict)})
+            this.context.reset();
+            this.current_img = null;
+            this.labels_counter = [];
+            this.unique_labels = [];
+            this.nr_labels = [];
+            document.getElementById("file_name").value = '';
+            document.getElementById("camera_type").value = '';
+            document.getElementById("location").value = '';
           }
-          for(let i = 0; i < fatal_indexes.length; i++)
-          {
-            this.labels.splice(fatal_indexes[i], 1);
-            this.rec_beg_x.splice(fatal_indexes[i], 1);
-            this.rec_beg_y.splice(fatal_indexes[i], 1);
-            this.rec_w.splice(fatal_indexes[i], 1);
-            this.rec_h.splice(fatal_indexes[i], 1);
-            this.stroke_colors.splice(fatal_indexes[i], 1);
-            this.fill_colors.splice(fatal_indexes[i], 1);
+          else {
+            alert("Aby zapisać zmiany, musisz sprecyzować nazwę pliku wynikowego.")
           }
-          const dict = {
-            "login": app.config.globalProperties.$login.value,
-            "password": app.config.globalProperties.$password.value,
-            "labels": this.labels,
-            "image": image,
-            "rec_beg_x": this.rec_beg_x,
-            "rec_beg_y": this.rec_beg_y,
-            "rec_w": this.rec_w,
-            "rec_h": this.rec_h,
-            "fill_colors":this.fill_colors,
-            "stroke_colors":this.stroke_colors,
-          };
-          await axios.post("http://localhost:5000/save_annotations", {params: JSON.stringify(dict)})
-          this.context.reset();
-          this.current_img = null;
-          this.labels_counter = [];
-          this.unique_labels = [];
-          this.nr_labels = [];
         },
 
         async loadImportedImages() {
@@ -292,6 +356,10 @@ export default {
             this.displayed_annotated_images.push.apply(this.displayed_annotated_images, this.annotated.slice(length, length + 4));
         },
         async selected(index,num) {
+          document.getElementById("file_name").value = '';
+          document.getElementById("camera_type").value = '';
+          document.getElementById("location").value = '';
+          document.getElementById("object_type").value = '';
           this.source = 'importowane';
           this.work_option="Tryb: ";
           this.indexOfCurrentImage = index;
@@ -330,6 +398,11 @@ export default {
             "password": app.config.globalProperties.$password.value,
             "image": this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1],
             };
+            let response_ad = await axios.post("http://localhost:5000/get_image_info", {params: JSON.stringify(dict)})
+            let data = response_ad.data["description"]
+            document.getElementById("file_name").value = data[2];
+            document.getElementById("camera_type").value = data[0];
+            document.getElementById("location").value = data[1];
             const rec_beg_x=[];
             const rec_beg_y=[];
             const rec_w=[];
@@ -338,12 +411,13 @@ export default {
             const stroke_colors=[];
             const fill_colors=[];
             let response = await axios.post("http://localhost:5000/get_annotations", {params: JSON.stringify(dict)})//.then(function (response) {
-            for (let i = 0; i < response.data["rect index"].length; i++) {
+            for (let i = 0; i < response.data["stroke_cols"].length; i++) {
               rec_beg_x.push(response.data["rec_beg_x"][i]);
               rec_beg_y.push(response.data["rec_beg_y"][i]);
               rec_w.push(response.data["rec_w"][i]);
               rec_h.push(response.data["rec_h"][i]);
               labels.push(response.data["labels"][i]);
+              console.log(response.data["stroke_cols"][i])
               let strokes = response.data["stroke_cols"][i].split(", ");
               let stroke = [];
               stroke.push(parseFloat(strokes[0].split("[")[1]));
@@ -378,9 +452,11 @@ export default {
             this.drawAllRects();
           }
 
+
         },
         drawAllRects()
         {
+          console.log(this.stroke_colors)
           this.context.beginPath();
           this.context.drawImage(this.current_img, 0, 0, this.current_img.width * 3.33, this.current_img.height * 3.33);
           for(let i = 0; i < this.rec_counter; i++)
