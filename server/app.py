@@ -8,7 +8,7 @@ CORS(app)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_PASSWORD'] = '1234'
 app.config['MYSQL_DB'] = 'projekt_io'
 mysql = MySQL(app)
 
@@ -306,7 +306,6 @@ def get_image_info():
             data = cur.fetchall()
             data = data[0]
         cur.close()
-        print("d", data)
         return json.dumps({"description": data}, ensure_ascii=False)
     except Exception:
         cur.execute("SELECT rodz_kam, pochodzenie, nazwa_pliku FROM info WHERE id_o = %s", (image_id,))
@@ -407,6 +406,149 @@ def get_categories():
         cur.close()
         return "Ojojoj"
 
+@app.route('/get_categories_coco', methods=['POST'])
+def get_categories_coco():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT COUNT(*) FROM kategorie WHERE id_uz = %s", (id,))
+        if_exist = cur.fetchall()
+        if_exist = if_exist[0][0]
+        if int(if_exist) == 0:
+            cur.close()
+            return "1"
+        else:
+            cur.execute("SELECT id, nazwa FROM kategorie WHERE id_uz = %s", (id,))
+            categories = cur.fetchall()
+            cur.close()
+            return json.dumps({"names": categories}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return "Ojojoj"
+
+@app.route('/get_image_and_annotation_info_coco', methods=['POST'])
+def get_image_and_annotation_info_coco():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    ind = data["indexes"]
+    categories = []
+    names = []
+    camera = []
+    location = []
+    ids_for_adns = []
+    id_kat = []
+    x_start = []
+    y_start = []
+    szer = []
+    wys = []
+    adnid = []
+    idadn = 1
+    images = []
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT id_o from import WHERE id_uz = %s AND czy_adnotacja = 1", (id, ))
+        id_o = cur.fetchall()
+        temp = [id_o[index - 1][0] for index in ind]
+        ind = temp
+        ind_in_order = []
+        for index in ind:
+            cur.execute("SELECT obraz from import WHERE id_uz = %s AND id_o = %s AND czy_adnotacja = 1", (id, index))
+            image = cur.fetchall()
+            image = image[0][0]
+            images.append(image)
+        for i in range(len(images)):
+            cur.execute("SELECT rodz_kam, pochodzenie, nazwa_pliku from info WHERE id_o = %s", (ind[i],))
+            info = cur.fetchall()
+            camera.append(info[0][0])
+            location.append(info[0][1])
+            names.append(info[0][2])
+            cur.execute("SELECT * from adnotacje WHERE id_o = %s", (ind[i],))
+            adns = cur.fetchall()
+            for adn in adns:
+                ids_for_adns.append(idadn)
+                adnid.append(adn[0])
+                id_kat.append(adn[1])
+                x_start.append(adn[2])
+                y_start.append(adn[3])
+                szer.append(adn[4])
+                wys.append(adn[5])
+                ind_in_order.append(ind[i])
+                idadn += 1
+        cur.close()
+        return json.dumps({"id_o":ind_in_order, "names": names, "camera": camera, "location": location, "adnid": adnid,
+                           "ids_for_adns":ids_for_adns,"id_kat":id_kat, "x_start":x_start, "y_start":y_start,
+                           "szer":szer, "wys":wys}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return "Ojojoj"
+
+@app.route('/get_names_of_files', methods=['POST'])
+def get_names_of_files():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    ind = data["indexes"]
+    names = []
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT id_o from import WHERE id_uz = %s AND czy_adnotacja = 1", (id,))
+        id_o = cur.fetchall()
+        real_ind = []
+        for index, t_index in enumerate(ind):
+            val = id_o[index][0]
+            real_ind.append(val)
+        names = []
+        for t_index in real_ind:
+            cur.execute("SELECT nazwa_pliku from info WHERE id_o = %s",(t_index,))
+            name = cur.fetchall()
+            name = name[0][0]
+            names.append(name)
+        return json.dumps({"names": names}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return "Ojojoj"
+@app.route('/change_index_to_id', methods=['POST'])
+def change_index_to_id():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    ind = data["indexes"]
+    names = []
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT id_o from import WHERE id_uz = %s AND czy_adnotacja = 1", (id,))
+        id_o = cur.fetchall()
+        new_id = []
+        for index,id in enumerate(id_o):
+            if index in ind:
+                new_id.append(id)
+        return json.dumps({"ids": new_id}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return "Ojojoj"
 
 if __name__ == '__main__':
     app.run()

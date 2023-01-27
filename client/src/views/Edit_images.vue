@@ -9,7 +9,7 @@
       <p>{{"Wybierz rodzaj kamery"}}</p>
         <input type="text" id="camera_type" v-on:keyup.enter="onEnterCameraType"/>
       <p>{{"Wpisz lokalizację wykonania zdjęcia"}}</p>
-        <input type="text" id="location" v-on:keyup.enter="onEnterLocation"/>
+        <input type="text" id="location" v-on:keyup.enter="onEnterLocation" value=""/>
     </div>
       <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
       <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
@@ -136,7 +136,7 @@ export default {
             }
           }
           else
-            document.getElementById("camera_type").value = '';
+            document.getElementById("camera_type").value = 'optional';
         },
         onEnterLocation: function()
         {
@@ -237,8 +237,8 @@ export default {
               "password": app.config.globalProperties.$password.value,
               "image": image,
               "name": this.file_name,
-              "camera": '',
-              "location": '',
+              "camera": this.camera_type,
+              "location": this.location,
             }
             if (this.camera_type !== '')
               inf_dict["camera"] = this.camera_type;
@@ -263,6 +263,8 @@ export default {
             this.labels_counter = [];
             this.unique_labels = [];
             this.nr_labels = [];
+            this.camera_type = '';
+            this.location = '';
             document.getElementById("file_name").value = '';
             document.getElementById("camera_type").value = '';
             document.getElementById("location").value = '';
