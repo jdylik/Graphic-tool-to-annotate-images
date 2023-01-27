@@ -23,7 +23,17 @@ import axios from "axios";
 import JSZip from "jszip";
 import { saveAs } from 'file-saver';
 import resizebase64 from "resize-base64";
+function b64toBlob(dataURI) {
 
+    var byteString = atob(dataURI.split(',')[1]);
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: 'image/jpeg' });
+}
 
 
 
@@ -47,6 +57,7 @@ export default {
     }
   },
   methods: {
+
     async saveZip(filename, urls) {
       await this.files_names;
       let zip = new JSZip();
@@ -55,13 +66,14 @@ export default {
       {
         folder.file(this.files_names[i]+".jpg", urls[i]);
       }
-      console.log(folder)
-      //folder.file(`${filename}-coco.json`, urls[urls.length-1]);
+      let folder2 = zip.folder("std")
+      folder2.file(`${filename}-coco.json`, urls[urls.length-1]);
       //await folder.generateAsync({ type: "base64" });
       //let coco_folder = zip.folder(filename+"-coco");
       //coco_folder.file(`${filename}-coco.json`, urls[urls.length-1]);
       //console.log(urls[urls.length-1].data)
-      folder.generateAsync({ type: "base64" }).then(content => saveAs(content, filename));
+      folder2.generateAsync({ type: "binarystring" }).then(content => saveAs(content, filename));
+      //folder.generateAsync({ type: "blob" }).then(content => saveAs(content, filename));
     },
     async loadAnnotatedImages() {
       // this.p_name=document.getElementById('project_name').value;
@@ -101,7 +113,8 @@ export default {
         {
           let resizebase64 = require('resize-base64');
           let img = resizebase64(this.annotated[i], 666, 500);
-          to_download.push(img);
+          let blob = b64toBlob(img)
+          to_download.push(blob);
         }
         this.to_download=to_download;
         await this.getCoco(this.to_download);
