@@ -68,10 +68,6 @@ export default {
       }
       let folder2 = zip.folder("std")
       folder2.file(`${filename}-coco.json`, urls[urls.length-1]);
-      //await folder.generateAsync({ type: "base64" });
-      //let coco_folder = zip.folder(filename+"-coco");
-      //coco_folder.file(`${filename}-coco.json`, urls[urls.length-1]);
-      //console.log(urls[urls.length-1].data)
       folder2.generateAsync({ type: "binarystring" }).then(content => saveAs(content, filename));
       //folder.generateAsync({ type: "blob" }).then(content => saveAs(content, filename));
     },
