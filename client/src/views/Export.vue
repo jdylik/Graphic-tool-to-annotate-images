@@ -14,6 +14,14 @@
       </li>
     </ul>
   </div>
+  <div class="lista">
+        <ul class="typy">
+          <span v-if="string_visible">Podsumowanie liczności klas obiektów na wybranych zdjęciach:</span>
+          <li v-for="(value, index) in labels_to_display"  id="lista1">
+            <span>{{ value }} - {{nr_of_cases[index]}} wystąpień</span>
+          </li>
+        </ul>
+      </div>
 </template>
 
 <script>
@@ -54,6 +62,9 @@ export default {
       chosen_ind:[],
       produced_coco:null,
       files_names:null,
+      labels_to_display:[],
+      nr_of_cases:[],
+      string_visible:'',
     }
   },
   methods: {
@@ -102,6 +113,7 @@ export default {
     async exportAll(){
       await this.loadAnnotatedImages();
       this.chosen_ind = this.annotated_ind;
+      await this.displayStats(this.chosen_ind);
       if(this.annotated)
       {
         const to_download=[];
@@ -138,6 +150,8 @@ export default {
     },
      async selected(index)
      {
+            this.labels_to_display = [];
+            this.nr_of_cases = [];
             this.current_img = document.getElementById(index);
             if (this.chosen_ind.includes(index)) {
               this.current_img.style.border = "5px solid white";
@@ -148,7 +162,22 @@ export default {
               this.current_img.style.border = "5px solid yellow";
               this.chosen_ind.push(index)
             }
+            this.string_visible = true;
+            await this.displayStats(this.chosen_ind);
         },
+    async displayStats(table)
+    {
+      const ext_dict = {
+            "login": app.config.globalProperties.$login.value,
+            "password": app.config.globalProperties.$password.value,
+            "indexes": table,
+      }
+      let elements_response = await axios.post("http://localhost:5000/count_classes", {params: JSON.stringify(ext_dict)});
+      let data = elements_response.data;
+      this.labels_to_display = Object.keys(data);
+      this.nr_of_cases = Object.values(data);
+      this.string_visible = true;
+    },
     async getCoco(table)
     {
       this.p_name = document.getElementById("project_name").value;
@@ -200,6 +229,10 @@ export default {
         anns.push(ann);
       }
       this.produced_coco = JSON.stringify("{"+info+cats+imgs+anns+"}");
+    },
+    mounted()
+    {
+      this.string_visible = false;
     }
 }}
 </script>
@@ -222,7 +255,6 @@ export default {
   box-shadow: 3px 3px 6px rgba(70, 70, 70, 0.8);
   cursor: pointer;
 }
-
 #project_name{
   margin-bottom: 30px;
 }

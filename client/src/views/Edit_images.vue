@@ -5,11 +5,11 @@
     <div id="kanwas">
           <div id="add_data">
       <p>{{"Wybierz nazwę pliku"}}</p>
-        <input type="text" id="file_name" v-on:keyup.enter="onEnterFileName"/>
+        <input type="text" id="file_name"/>
       <p>{{"Wybierz rodzaj kamery"}}</p>
-        <input type="text" id="camera_type" v-on:keyup.enter="onEnterCameraType"/>
+        <input type="text" id="camera_type"/>
       <p>{{"Wpisz lokalizację wykonania zdjęcia"}}</p>
-        <input type="text" id="location" v-on:keyup.enter="onEnterLocation" value=""/>
+        <input type="text" id="location"/>
     </div>
       <canvas id="myCanvas" width="666" height="500" style="border:5px solid black;"/>
       <!--ta lista oraz pole input poniżej ma się znaleźć obok canvasa-->
@@ -116,39 +116,6 @@ export default {
   },
   methods:
       {
-        onEnterFileName: function()
-        {
-          if (this.current_img !== null) {
-            let file_name = document.getElementById("file_name").value;
-            if (file_name !== '' && !file_name.includes(" ") && !file_name.includes("\"")) {
-              this.file_name = file_name;
-            }
-          }
-          else
-            document.getElementById("file_name").value = '';
-        },
-        onEnterCameraType: function()
-        {
-          if (this.current_img !== null) {
-            let camera_type = document.getElementById("camera_type").value;
-            if (camera_type !== '' && !camera_type.includes("\"")) {
-              this.camera_type = camera_type;
-            }
-          }
-          else
-            document.getElementById("camera_type").value = 'optional';
-        },
-        onEnterLocation: function()
-        {
-          if (this.current_img !== null) {
-            let location = document.getElementById("location").value;
-            if (location !== '' && !location.includes("\"")) {
-              this.location = location;
-            }
-          }
-          else
-            document.getElementById("location").value = '';
-        },
         onEnter:function() {
           this.ifButtonDrawClicked = false;
           if (document.getElementById("object_type").value !== '') {
@@ -217,6 +184,7 @@ export default {
               image = this.annotated[this.indexOfCurrentImage].split("data:image/jpeg;base64,")[1];
             let element, previous;
             let fatal_indexes = [];
+            console.log(this.rec_beg_x)
             for (let i = 0; i < this.labels.length; i++) {
               element = this.rec_beg_x[i];
               if (element === previous && this.rec_beg_y[i] === this.rec_beg_y[i - 1] && this.rec_w[i] === this.rec_w[i - 1] && this.rec_h[i] === this.rec_h[i - 1])
@@ -232,6 +200,7 @@ export default {
               this.stroke_colors.splice(fatal_indexes[i], 1);
               this.fill_colors.splice(fatal_indexes[i], 1);
             }
+            console.log(this.rec_beg_x);
             const inf_dict = {
               "login": app.config.globalProperties.$login.value,
               "password": app.config.globalProperties.$password.value,
@@ -402,9 +371,13 @@ export default {
             };
             let response_ad = await axios.post("http://localhost:5000/get_image_info", {params: JSON.stringify(dict)})
             let data = response_ad.data["description"]
+            console.log(data)
             document.getElementById("file_name").value = data[2];
             document.getElementById("camera_type").value = data[0];
             document.getElementById("location").value = data[1];
+            this.file_name = data[2];
+            this.camera_type = data[0];
+            this.location = data[1];
             const rec_beg_x=[];
             const rec_beg_y=[];
             const rec_w=[];
@@ -443,8 +416,9 @@ export default {
             this.rec_counter=this.rec_beg_x.length;
             for (let i = 0; i < this.labels.length; i++)
             {
-              if (this.labels[i] in Object.keys(this.labels_counter)) {
+              if (Object.hasOwn(this.labels_counter, this.labels[i])) {
                 this.labels_counter[this.labels[i]] += 1;
+                console.log(this.labels_counter)
               }
               else
                 this.labels_counter[this.labels[i]] = 1;
@@ -705,6 +679,39 @@ export default {
       },
       async mounted()
       {
+        document.getElementById("file_name").addEventListener("input", (event) =>
+        {
+          if (this.current_img !== null) {
+            let file_name = document.getElementById("file_name").value;
+            if (file_name !== '' && !file_name.includes(" ") && !file_name.includes("\"")) {
+              this.file_name = file_name;
+            }
+          }
+          else
+            document.getElementById("file_name").value = '';
+        });
+        document.getElementById("camera_type").addEventListener("input", (event) =>
+        {
+          if (this.current_img !== null) {
+            let camera_type = document.getElementById("camera_type").value;
+            if (camera_type !== '' && !camera_type.includes(" ") && !camera_type.includes("\"")) {
+              this.camera_type = camera_type;
+            }
+          }
+          else
+            document.getElementById("camera_type").value = '';
+        });
+        document.getElementById("location").addEventListener("input", (event) =>
+        {
+          if (this.current_img !== null) {
+            let location = document.getElementById("location").value;
+            if (location !== '' && !location.includes(" ") && !location.includes("\"")) {
+              this.location = location;
+            }
+          }
+          else
+            document.getElementById("location").value = '';
+        });
         this.canvas = document.getElementById("myCanvas");
         this.context = this.canvas.getContext("2d");
         const req_dict = {

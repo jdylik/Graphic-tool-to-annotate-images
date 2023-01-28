@@ -190,56 +190,57 @@ def save_annotations():
         cur.execute("SELECT COUNT(*) FROM adnotacje WHERE id_o = %s", (image_id,))
         nr = cur.fetchall()
         nr = int(nr[0][0])
-        if len(labels) == 0 and nr != 0:
-            cur.execute("DELETE FROM adnotacje WHERE id_o = %s", (image_id,))
-        elif len(labels) < nr:
-            for i in range(0, len(labels)):
-                cur.execute("SELECT COUNT(*) FROM kategorie WHERE nazwa = %s AND id_uz = %s", (unique_labels[i], id))
-                if_exists = cur.fetchall()
-                if_exists = if_exists[0][0]
-                if int(if_exists) == 0:
-                    cur.execute("INSERT INTO kategorie (nazwa, szkic_kolor, wyp_kolor, id_uz) VALUES (%s, %s, %s, %s)",
-                                (unique_labels[i], str(unique_stroke_c[i]), str(unique_fill_c[i]), id))
-                    mysql.connection.commit()
-            cur.execute("SELECT x_start, y_start, szer, wys FROM adnotacje WHERE id_o = %s", (image_id,))
-            ann_data = cur.fetchall()
-            for i in range(0, len(ann_data)):
-                annotation = ann_data[i]
-                x_start = annotation[0]
-                y_start = annotation[1]
-                szer = annotation[2]
-                wys = annotation[3]
-                if x_start not in rec_beg_x or y_start not in rec_beg_y or szer not in rec_w or wys not in rec_h:
-                    cur.execute(
-                        "DELETE FROM adnotacje WHERE id_o = %s AND x_start = %s AND y_start = %s AND szer = %s AND wys = %s",
-                        (image_id, x_start, y_start, szer, wys))
-                    mysql.connection.commit()
-            cur.execute("SELECT x_start, y_start, szer, wys FROM adnotacje WHERE id_o = %s", (image_id,))
-            existing_adn = cur.fetchall()
-            for annot in existing_adn:
-                for index, element in enumerate(rec_beg_x):
-                    if element != annot[0] or rec_beg_y[index] != annot[1] or rec_w[index] != annot[2] or rec_h[
-                        index] != annot[3]:
-                        cur.execute(
-                            "INSERT INTO adnotacje (id_kat, id_o, x_start, y_start, szer, wys) VALUES (%s, %s, %s, %s, %s, %s)",
-                            (labels[index], image_id, rec_beg_x[index], rec_beg_y[index], rec_w[index], rec_h[index]))
-                        mysql.connection.commit()
-        else:
-            for i in range(0, len(labels)):
+        cur.execute("SELECT id_adn, id_kat, x_start, y_start, szer, wys FROM adnotacje WHERE id_o = %s", (image_id,))
+        result = cur.fetchall()
+        id_adn_old = []
+        id_kat_old = []
+        x_start_old = []
+        y_start_old = []
+        szer_old = []
+        wys_old = []
+        for i in range(len(result)):
+            id_adn_old.append(result[i][0])
+            id_kat_old.append(result[i][1])
+            x_start_old.append(result[i][2])
+            y_start_old.append(result[i][3])
+            szer_old.append(result[i][4])
+            wys_old.append(result[i][5])
+        id_removed = []
+        for j in range(len(id_adn_old)):
+            if x_start_old[j] not in rec_beg_x and y_start_old[j] not in rec_beg_y and wys_old[j] not in rec_h and szer_old[j] not in rec_w:
+                id_removed.append(id_adn_old[j])
+                cur.execute("DELETE FROM adnotacje WHERE id_adn = %s", (id_adn_old[j], ))
+                mysql.connection.commit()
+        if len(labels) != 0:
+            for i in range(0, len(rec_beg_x)):
                 cur.execute("SELECT COUNT(*) FROM kategorie WHERE nazwa = %s AND id_uz = %s", (labels[i], id))
                 if_exists = cur.fetchall()
                 if_exists = if_exists[0][0]
                 if int(if_exists) == 0:
-                    cur.execute("INSERT INTO kategorie (nazwa, szkic_kolor, wyp_kolor, id_uz) VALUES (%s, %s, %s, %s)",
-                                (unique_labels[i], str(unique_stroke_c[i]), str(unique_fill_c[i]), id))
+                    cur.execute("INSERT INTO kategorie (nazwa, szkic_kolor, wyp_kolor, id_uz) VALUES (%s, %s, %s, %s)",(labels[i], str(stroke_colors[i]), str(fill_colors[i]), id))
                     mysql.connection.commit()
                 cur.execute("SELECT id FROM kategorie WHERE nazwa=%s AND id_uz = %s", (labels[i], id))
                 label_id = cur.fetchall()
                 label_id = label_id[0][0]
-                cur.execute(
-                    "INSERT INTO adnotacje (id_kat, id_o, x_start, y_start, szer, wys) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (label_id, image_id, rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i]))
-        cur.execute("UPDATE import SET czy_adnotacja = (%s) WHERE id_o = (%s) AND id_uz = (%s)", (1, image_id, id))
+                cur.execute("SELECT IF(EXISTS(SELECT * FROM adnotacje WHERE id_o = %s AND x_start = %s AND y_start = %s AND szer =  %s AND wys = %s AND id_kat = %s),1,0)", (image_id,rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i], label_id))
+                nr_of = cur.fetchall()
+                nr_of = nr_of[0][0]
+                validate = 0
+                if nr_of != 0:
+                    cur.execute(
+                    "SELECT id_adn FROM adnotacje WHERE id_o = %s AND x_start = %s AND y_start = %s AND szer =  %s AND wys = %s AND id_kat = %s",
+                    (image_id, rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i], label_id))
+                    id_adn1 = cur.fetchall()
+                    validate = 0
+                else:
+                    validate = 1
+                if validate == 1:
+                    if len(id_removed) != 0:
+                        cur.execute("INSERT INTO adnotacje (id_adn, id_kat, id_o, x_start, y_start, szer, wys) VALUES (%s, %s, %s, %s, %s, %s, %s)",(id_removed[0], label_id, image_id, rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i]))
+                        id_removed.pop(0)
+                    else:
+                        cur.execute("INSERT INTO adnotacje (id_kat, id_o, x_start, y_start, szer, wys) VALUES (%s, %s, %s, %s, %s, %s)",(label_id, image_id, rec_beg_x[i], rec_beg_y[i], rec_w[i], rec_h[i]))
+        cur.execute("UPDATE import SET czy_adnotacja = (%s) WHERE id_o = (%s) AND id_uz = (%s)",(1, image_id, id))
         mysql.connection.commit()
         cur.close()
         return json.dumps({"annotation": labels}, ensure_ascii=False)
@@ -459,13 +460,13 @@ def get_image_and_annotation_info_coco():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT id_o from import WHERE id_uz = %s AND czy_adnotacja = 1", (id, ))
+        cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja = 1", (id, ))
         id_o = cur.fetchall()
         temp = [id_o[index - 1][0] for index in ind]
         ind = temp
         ind_in_order = []
         for index in ind:
-            cur.execute("SELECT obraz from import WHERE id_uz = %s AND id_o = %s AND czy_adnotacja = 1", (id, index))
+            cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND id_o = %s AND czy_adnotacja = 1", (id, index))
             image = cur.fetchall()
             image = image[0][0]
             images.append(image)
@@ -475,7 +476,7 @@ def get_image_and_annotation_info_coco():
             camera.append(info[0][0])
             location.append(info[0][1])
             names.append(info[0][2])
-            cur.execute("SELECT * from adnotacje WHERE id_o = %s", (ind[i],))
+            cur.execute("SELECT * FROM adnotacje WHERE id_o = %s", (ind[i],))
             adns = cur.fetchall()
             for adn in adns:
                 ids_for_adns.append(idadn)
@@ -509,7 +510,7 @@ def get_names_of_files():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT id_o from import WHERE id_uz = %s AND czy_adnotacja = 1", (id,))
+        cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja = 1", (id,))
         id_o = cur.fetchall()
         real_ind = []
         for index, t_index in enumerate(ind):
@@ -517,7 +518,7 @@ def get_names_of_files():
             real_ind.append(val)
         names = []
         for t_index in real_ind:
-            cur.execute("SELECT nazwa_pliku from info WHERE id_o = %s",(t_index,))
+            cur.execute("SELECT nazwa_pliku FROM info WHERE id_o = %s",(t_index,))
             name = cur.fetchall()
             name = name[0][0]
             names.append(name)
@@ -539,13 +540,53 @@ def change_index_to_id():
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
         id = cur.fetchall()
         id = id[0][0]
-        cur.execute("SELECT id_o from import WHERE id_uz = %s AND czy_adnotacja = 1", (id,))
+        cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja = 1", (id,))
         id_o = cur.fetchall()
         new_id = []
         for index,id in enumerate(id_o):
             if index in ind:
                 new_id.append(id)
         return json.dumps({"ids": new_id}, ensure_ascii=False)
+    except Exception:
+        cur.close()
+        return "Ojojoj"
+
+@app.route('/count_classes', methods=['POST'])
+def  count_classes():
+    data = request.json
+    data = data['params']
+    data = eval(data)
+    login = data["login"]
+    password = data["password"]
+    ind = data["indexes"]
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
+        id = cur.fetchall()
+        id = id[0][0]
+        cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja = 1", (id,))
+        id_o = cur.fetchall()
+        images_id = []
+        for index, id_oo in enumerate(id_o):
+            if index in ind:
+                images_id.append(id_oo)
+        results_dict = {}
+        for ido in images_id:
+            cur.execute("SELECT id_kat FROM adnotacje WHERE id_o = %s", (ido,))
+            results = cur.fetchall()
+            cor_results = [results[i][0] for i in range(len(results))]
+            for cat in cor_results:
+                if cat not in list(results_dict.keys()):
+                    results_dict[cat] = 1
+                else:
+                    results_dict[cat] += 1
+        for cat in list(results_dict.keys()):
+            cur.execute("SELECT nazwa FROM kategorie WHERE id = %s AND id_uz = %s", (cat, id))
+            name = cur.fetchall()
+            name = name[0][0]
+            results_dict[name] = results_dict[cat]
+            del results_dict[cat]
+        return json.dumps(results_dict, ensure_ascii=False)
     except Exception:
         cur.close()
         return "Ojojoj"

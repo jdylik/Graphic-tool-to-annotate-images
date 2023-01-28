@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="95f3ab76-f589-4043-a8e6-d3219efc415a" name="Changes" comment="implementacja eksportu - część pierwsza;&#10;zrobione: rozgraniczenie eksportu całości i wybranycyh zdjęć, eksport zdjęcia z formatu base64, wyświetlenie siatki zdjęć do wyboru;&#10;do zrobienia: checkboxy do wyboru zdjęć,&#10;przeskalowanie zdjęć,&#10;wybór nazwy projektu,&#10;złożenie pliku coco,&#10;eksport w zipie zdjęć i coco;">
+      <change beforePath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/Edit_images.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/views/Export.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/views/Export.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +138,7 @@
       <workItem from="1674644573371" duration="500000" />
       <workItem from="1674672654330" duration="2199000" />
       <workItem from="1674698909332" duration="1247000" />
-      <workItem from="1674857626799" duration="651000" />
+      <workItem from="1674857626799" duration="19426000" />
     </task>
     <task id="LOCAL-00001" summary="usunięcie polskich znaków w bazie">
       <created>1673348614589</created>
@@ -199,7 +201,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/baza_sql$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673789094825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1674857683672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/server$Flask__app_py_.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1674887542826" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$Flask.coverage" NAME="Flask (app.py) Coverage Results" MODIFIED="1673350456407" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/server$server.coverage" NAME="server Coverage Results" MODIFIED="1670847237825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
