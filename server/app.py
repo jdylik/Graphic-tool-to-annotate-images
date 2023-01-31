@@ -488,8 +488,8 @@ def get_image_and_annotation_info_coco():
                 y_start.append(adn[3])
                 szer.append(adn[4])
                 wys.append(adn[5])
-                ind_in_order.append(ind[i])
                 idadn += 1
+            ind_in_order.append(ind[i])
         cur.close()
         return json.dumps({"id_o":ind_in_order, "names": names, "camera": camera, "location": location, "adnid": adnid,
                            "ids_for_adns":ids_for_adns,"id_kat":id_kat, "x_start":x_start, "y_start":y_start,

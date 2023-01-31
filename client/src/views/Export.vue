@@ -233,7 +233,7 @@ export default {
         let ann={"id":ids_for_adns[i],"program_id":adnid[i],"image_id":img_ids[i],"category_id":id_kat[i],"segmentation":[x_start[i],y_start[i],(x_start[i]+szer[i]),y_start[i],(x_start[i]+szer[i]),(y_start[i]+wys[i]),x_start[i],(y_start[i]+wys[i])],"area":(szer[i]*wys[i]),"bbox": [x_start[i],y_start[i],szer[i],wys[i]],"iscrowd": 0};
         anns.push(ann);
       }
-      this.produced_coco = JSON.stringify({"info": info,"categories": [cats], "images": [imgs], "annotations": [anns]});
+      this.produced_coco = JSON.stringify({"info": info,"categories": cats, "images": imgs, "annotations": anns});
     },
     mounted()
     {
