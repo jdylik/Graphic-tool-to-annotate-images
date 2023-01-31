@@ -65,6 +65,7 @@ export default {
       labels_to_display:[],
       nr_of_cases:[],
       string_visible:'',
+      annotated_ind_list:[],
     }
   },
   methods: {
@@ -77,10 +78,11 @@ export default {
       {
         folder.file(this.files_names[i]+".jpg", urls[i]);
       }
-      let folder2 = zip.folder("std")
-      folder2.file(`${filename}-coco.json`, urls[urls.length-1]);
-      folder2.generateAsync({ type: "binarystring" }).then(content => saveAs(content, filename));
-      //folder.generateAsync({ type: "blob" }).then(content => saveAs(content, filename));
+      let json = new Blob([urls[urls.length-1]], {
+      type: 'application/json'
+      });
+      folder.file(`${filename}-coco.json`, json);
+      folder.generateAsync({ type: "blob" }).then(content => saveAs(content, filename));
     },
     async loadAnnotatedImages() {
       // this.p_name=document.getElementById('project_name').value;
@@ -89,19 +91,22 @@ export default {
             "password": app.config.globalProperties.$password.value,
           };
           const annotated = [];
-          const annotated_ind = [];                                                                                                                                                                                                                                                                                                                                                                                                                                                                             0
+          const annotated_ind = [];
+          const annotated_ind_list = [];
           await axios.post("http://localhost:5000/get_annotated_images_no_rects", {params: JSON.stringify(dict)}).then(function (response) {
             let data = response.data["images"];
             for(let i = 0; i < data.length; i++)
             {
               annotated.push("data:image/jpeg;base64," + data[i]);
               annotated_ind.push(response.data["indexes"][i][0]);
+              annotated_ind_list.push(i);
             }
             return annotated;
           });
           this.annotated = annotated;
           this.annotated_ind=annotated_ind;
           this.displayed_annotated_images=annotated;
+          this.annotated_ind_list = annotated_ind_list;
           const ext_dict = {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
@@ -112,7 +117,7 @@ export default {
         },
     async exportAll(){
       await this.loadAnnotatedImages();
-      this.chosen_ind = this.annotated_ind;
+      this.chosen_ind = this.annotated_ind_list;
       await this.displayStats(this.chosen_ind);
       if(this.annotated)
       {
@@ -121,7 +126,7 @@ export default {
         {
           let resizebase64 = require('resize-base64');
           let img = resizebase64(this.annotated[i], 666, 500);
-          let blob = b64toBlob(img)
+          let blob = b64toBlob(img);
           to_download.push(blob);
         }
         this.to_download=to_download;
@@ -139,7 +144,8 @@ export default {
           for (let i = 0; i < this.chosen_ind.length; i++) {
             let resizebase64 = require('resize-base64');
             let img = resizebase64(this.annotated[this.chosen_ind[i]], 666, 500);
-            to_download.push(img);
+            let blob = b64toBlob(img);
+            to_download.push(blob);
           }
           this.to_download = to_download;
           await this.getCoco(this.to_download);
@@ -184,7 +190,7 @@ export default {
       let ids = [];
       for(let i = 1; i < table.length + 1; i++)
         ids.push(i);
-      let info = "\"info\": {\"year\": " + new Date().getFullYear() +",\"description\": " + this.p_name + ",\"date_created\": " + new Date().toJSON().slice(0, 10) + "},";
+      let info = {"year": new Date().getFullYear(),"description": this.p_name,"date_created": new Date().toJSON().slice(0, 10)};
       const dict = {
             "login": app.config.globalProperties.$login.value,
             "password": app.config.globalProperties.$password.value,
@@ -194,7 +200,7 @@ export default {
       let cats = [];
       for (let i = 0; i < cat_data.length; i++)
       {
-        let cat="{\"id\": "+cat_data[i][0] + ",\"name\": "+cat_data[i][1]+"}";
+        let cat={"id":cat_data[i][0], "name":cat_data[i][1]};
         cats.push(cat);
       }
       const ext_dict = {
@@ -219,16 +225,15 @@ export default {
       for (let i = 0; i < img_data.length; i++)
       {
         let img= {"id": ids[i],"program_id": img_ids[i],"width": 666,"height": 550,"file_name": img_data[i]+".jpg","camera": camera[i],"location": loc[i],"metadata": "brak"};
-        let img2= "{\"id\": "+ids[i]+",\"program_id\": "+img_ids[i]+",\"width\": "+666+",\"height\": "+550+",\"file_name\": "+img_data[i]+".jpg\"+,\"camera\": "+camera[i]+",\"location\": "+loc[i]+",\"metadata\": \"brak\"}";
-        imgs.push(img2);
+        imgs.push(img);
       }
       let anns = []
       for (let i = 0; i < wys.length; i++)
       {
-        let ann= "{\"id\":"+ids_for_adns[i]+",\"program_id\":"+adnid[i]+",\"image_id\":"+img_ids[i]+",\"category_id\":"+id_kat[i]+",\"segmentation\":[["+x_start[i]+","+y_start[i]+","+(x_start[i]+szer[i])+","+y_start[i]+","+(x_start[i]+szer[i])+","+(y_start[i]+wys[i])+","+x_start[i]+","+(y_start[i]+wys[i])+"]],\"area\":"+(szer[i]*wys[i])+",\"bbox\": ["+x_start[i]+","+y_start[i]+","+szer[i]+","+wys[i]+"],\"iscrowd\": 0}";
+        let ann={"id":ids_for_adns[i],"program_id":adnid[i],"image_id":img_ids[i],"category_id":id_kat[i],"segmentation":[x_start[i],y_start[i],(x_start[i]+szer[i]),y_start[i],(x_start[i]+szer[i]),(y_start[i]+wys[i]),x_start[i],(y_start[i]+wys[i])],"area":(szer[i]*wys[i]),"bbox": [x_start[i],y_start[i],szer[i],wys[i]],"iscrowd": 0};
         anns.push(ann);
       }
-      this.produced_coco = JSON.stringify("{"+info+cats+imgs+anns+"}");
+      this.produced_coco = JSON.stringify({"info": info,"categories": [cats], "images": [imgs], "annotations": [anns]});
     },
     mounted()
     {

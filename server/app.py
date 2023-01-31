@@ -441,7 +441,7 @@ def get_image_and_annotation_info_coco():
     data = eval(data)
     login = data["login"]
     password = data["password"]
-    ind = data["indexes"]
+    inde = data["indexes"]
     categories = []
     names = []
     camera = []
@@ -455,6 +455,7 @@ def get_image_and_annotation_info_coco():
     adnid = []
     idadn = 1
     images = []
+    ind = []
     cur = mysql.connection.cursor()
     try:
         cur.execute("SELECT id FROM logowanie WHERE login = %s AND haslo = %s", (login, password))
@@ -462,8 +463,9 @@ def get_image_and_annotation_info_coco():
         id = id[0][0]
         cur.execute("SELECT id_o FROM import WHERE id_uz = %s AND czy_adnotacja = 1", (id, ))
         id_o = cur.fetchall()
-        temp = [id_o[index - 1][0] for index in ind]
-        ind = temp
+        for index in inde:
+            temp = id_o[index-1][0]
+            ind.append(temp)
         ind_in_order = []
         for index in ind:
             cur.execute("SELECT obraz FROM import WHERE id_uz = %s AND id_o = %s AND czy_adnotacja = 1", (id, index))
