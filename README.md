@@ -14,17 +14,17 @@ The technology scope:
 
 - frontend:
 
-  a) HTML
+  a) HTML,
   
-  b) CSS
+  b) CSS,
   
-  c) JavaScript in form of its framework - Vue.js
+  c) JavaScript in form of its framework - Vue.js.
   
 - backend:
 
-  a) Python in form of its framework - Flask
+  a) Python in form of its framework - Flask,
   
-  b) MySQL database
+  b) MySQL database.
 
 
 The team worked in given squad:
