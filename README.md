@@ -13,11 +13,17 @@ Main part of application, graphic tool, let the user mark requested object by tr
 The technology scope:
 
 - frontend:
+
   a) HTML
+  
   b) CSS
+  
   c) JavaScript in form of its framework - Vue.js
+  
 - backend:
+
   a) Python in form of its framework - Flask
+  
   b) MySQL database
 
 
